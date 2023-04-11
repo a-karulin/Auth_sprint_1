@@ -1,0 +1,33 @@
+swagger: 3.0
+openapi: 3.0.0
+
+info:
+  description: Auth API
+  version: "1.0.0"
+  title: Auth API
+tags:
+  - name: 'auth_api'
+    description: 'Authentication api'
+
+paths:
+  /api/v1/auth/signup:
+    post:
+      summary: Регистрация нового пользователя
+
+  /api/v1/auth/login:
+    post:
+      summary: Вход в учетную запись
+
+  /api/v1/auth/logout:
+    post:
+      summary: Выход из учетной записи
+
+  /api/v1/auth/refresh:
+    post:
+      summary: Обновление токена
+
+  /api/v1/auth/change-password:
+    post:
+      summary: Изменить пароль
+
+  

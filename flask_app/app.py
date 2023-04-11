@@ -1,19 +1,18 @@
 from flask import Flask
-from db import init_db
-
-
-app = Flask(__name__)
-
-
-@app.route('/hello-world')
-def hello_world():
-    return 'Hello, World!'
+from flask_sqlalchemy import SQLAlchemy
+from flasgger import Swagger
+from flask_app.api.v1.auth import auth
+from flask_app.api.v1.roles import roles
+from flask_app.api.v1.users import users
 
 
 def main():
-    init_db()
-    app.run()
+    app = Flask(__name__)
 
+    Swagger(app, template_file="project-description/openapi.yaml")
+    SQLAlchemy(app)
 
-if __name__ == '__main__':
-    main() 
+    app.register_blueprint(auth, url_prefix="/api/v1/auth")
+    app.register_blueprint(roles, url_prefix="/api/v1/roles")
+    app.register_blueprint(users, url_prefix="/api/v1/users")
+    return app
