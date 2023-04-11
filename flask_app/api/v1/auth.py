@@ -23,6 +23,6 @@ def refresh_token():
     pass
 
 
-@auth.route("/change-password", methods=["POST"])
-def change_password():
+@auth.route("/update-data", methods=["POST"])
+def update_data():
     pass
