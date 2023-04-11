@@ -14,5 +14,5 @@ def apply_roles():
 
 
 @users.route("/{user_id}/delete_role", methods=["DELETE"])
-def delete_role_from_user():
+def delete_user_from_role():
     pass
