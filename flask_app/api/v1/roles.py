@@ -4,12 +4,12 @@ from flask import Blueprint
 roles = Blueprint("roles", __name__)
 
 
-@roles.route("/roles", methods=["GET"])
+@roles.route("/", methods=["GET"])
 def roles_list():
     pass
 
 
-@roles.route("/create", methods=["POST"])
+@roles.route("/", methods=["POST"])
 def create_role():
     pass
 

@@ -11,13 +11,8 @@ class User(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     login = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
-
-    def __init__(self, login, password):
-        self.login = login
-        self.password = password
-
-    def __repr__(self):
-        return f'<User {self.login}>'
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
 
 
 class Roles(Base):
@@ -25,9 +20,6 @@ class Roles(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     role = Column(String, unique=True, nullable=False)
-
-    def __repr__(self):
-        return f'<Roles {self.name}>'
 
 
 class UsersRoles(Base):
