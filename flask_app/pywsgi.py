@@ -1,4 +1,3 @@
-# flask_app/pywsgi.py
 from gevent import monkey
 monkey.patch_all()
 

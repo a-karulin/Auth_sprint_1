@@ -6,13 +6,11 @@ from flask_app.api.v1.roles import roles
 from flask_app.api.v1.users import users
 
 
-def main():
-    app = Flask(__name__)
+app = Flask(__name__)
 
-    Swagger(app, template_file="project-description/openapi.yaml")
-    SQLAlchemy(app)
+Swagger(app, template_file="project-description/openapi.yaml")
+SQLAlchemy(app)
 
-    app.register_blueprint(auth, url_prefix="/api/v1/auth")
-    app.register_blueprint(roles, url_prefix="/api/v1/roles")
-    app.register_blueprint(users, url_prefix="/api/v1/users")
-    return app
+app.register_blueprint(auth, url_prefix="/api/v1/auth")
+app.register_blueprint(roles, url_prefix="/api/v1/roles")
+app.register_blueprint(users, url_prefix="/api/v1/users")
