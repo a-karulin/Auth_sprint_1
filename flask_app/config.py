@@ -6,7 +6,7 @@ from pydantic import Field, BaseSettings
 load_dotenv()
 
 
-POSTGRES_CONN_STR = os.environ.get('POSTGRES_CONN_STR', 500)
+POSTGRES_CONN_STR = os.environ.get('POSTGRES_CONN_STR')
 
 
 class RedisConfig(BaseSettings):
