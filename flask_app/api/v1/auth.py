@@ -31,12 +31,11 @@ def login_user():
 def logout():
     token = get_jwt()
     jti = token["jti"]
-
+    ttype = token["type"]
     jwt_redis_blocklist.set(jti, "", ex=ACCESS_EXPIRES)
 
     # Returns "Access token revoked" or "Refresh token revoked"
-
-    return jsonify(msg=f"Access token revoked")
+    return jsonify(msg=f"{ttype.capitalize()} token successfully revoked")
 
 
 @auth.route("/refresh", methods=["POST"])
