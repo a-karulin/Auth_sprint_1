@@ -17,8 +17,10 @@ def create_user():
 
 
 @auth.route("/login", methods=["POST"])
-def login_user(login: str, password: str):
-    user = db_session.query(User).filter(User.login == login).first()
+def login_user():
+    login = request.form.get("login")
+    password = request.form.get("password", None)
+    user = db_session.query(User).filter(User.login == login).one()
     if not user:
         return HTTPStatus.NOT_FOUND
     user_id = str(user.id)
