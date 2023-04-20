@@ -1,5 +1,5 @@
 import sqlalchemy.orm
-from flask import Response
+from flask import abort
 from sqlalchemy.exc import NoResultFound
 from werkzeug.security import generate_password_hash
 
@@ -36,8 +36,4 @@ class UserService:
             new_user = session.query(User).filter(User.login == login).one()
             return {'user_id': new_user.id}
         else:
-            return Response(
-                "{'result':'user with this login already exists'}",
-                status=400,
-                mimetype='application/json',
-            )
+            abort(400)
