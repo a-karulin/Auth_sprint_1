@@ -21,7 +21,7 @@ def upgrade() -> None:
     # op.execute("create schema auth")
     op.create_table(
         'users',
-        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('id', sa.UUID(), nullable=False),
         sa.Column('login', sa.String(length=255), nullable=False),
         sa.Column('password', sa.String(length=255), nullable=False),
         sa.Column('first_name', sa.String(length=255), nullable=False),
