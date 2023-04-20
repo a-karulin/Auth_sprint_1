@@ -42,8 +42,7 @@ def login_user():
     user_id = str(user.id)
     hash = generate_password_hash(password)
     if check_password_hash(hash, user.password):
-        access_token = create_access_token(identity=user.id, fresh=True)
-        refresh_token = create_refresh_token(identity=user.id)
+        access_token, refresh_token = create_access_and_refresh_tokens({'user_id': user_id})
         history_service = HistoryService()
         history_service.create_history_record(
             user_id=user_id,
