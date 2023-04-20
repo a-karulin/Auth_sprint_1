@@ -7,13 +7,20 @@ from flask_jwt_extended import create_refresh_token
 from database.db import db_session
 from database.db_models import User, History
 from werkzeug.security import check_password_hash, generate_password_hash
+from services.user import UserService
 
 auth = Blueprint("auth", __name__)
 
 
 @auth.route("/signup", methods=["POST"])
 def create_user():
-    pass
+    db = UserService()
+    return db.register_user(
+        login=request.json.get('login'),
+        password=request.json.get('password'),
+        last_name=request.json.get('password'),
+        first_name=request.json.get('password'),
+    )
 
 
 @auth.route("/login", methods=["POST"])

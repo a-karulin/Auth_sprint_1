@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from config import POSTGRES_CONN_STR
 
-engine = create_engine(POSTGRES_CONN_STR)
+engine = create_engine(POSTGRES_CONN_STR, echo=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
