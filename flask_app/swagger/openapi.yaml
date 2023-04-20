@@ -18,22 +18,18 @@ paths:
     post:
       summary: 'Вход в учетную запись'
       tags:
-        - auth_api
-        requestBody:
-          content:
-            application/json:
-              schema:
-                required:
-                  - login
-                  - password
-                properties:
-                  login:
-                    type: string
-                    example: "login"
-                  password:
-                    type: string
-                    example: 'password'
-          description: 'Данные пользователя для входа'
+        - login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                password:
+                  type: string
         responses:
           '200':
             description: 'Success login'
