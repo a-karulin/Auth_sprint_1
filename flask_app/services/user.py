@@ -22,7 +22,7 @@ class UserService:
             session: sqlalchemy.orm.Session = None
     ):
         try:
-            user = session.query(User).filter(User.login == login).one()
+            session.query(User).filter(User.login == login).one()
         except NoResultFound:
             password_hash = generate_password_hash(password)
             new_user = User(
