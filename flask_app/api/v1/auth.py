@@ -21,7 +21,7 @@ def create_user():
     response = {
         'access_token': access_token,
         'refresh_token': refresh_token,
-        id: new_user,
+        'id': new_user,
     }
     return jsonify(response), HTTPStatus.CREATED
 
@@ -37,7 +37,7 @@ def logout():
 
 
 @auth.route("/refresh", methods=["POST"])
-def refresh_token():
+def refresh_tokens():
     pass
 
 
