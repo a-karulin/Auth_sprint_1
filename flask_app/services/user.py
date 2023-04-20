@@ -1,4 +1,7 @@
 import sqlalchemy.orm
+from flask import Response
+from sqlalchemy.exc import NoResultFound
+from werkzeug.security import generate_password_hash
 
 from database.db import engine
 from database.db_models import User
@@ -18,9 +21,23 @@ class UserService:
             last_name: str,
             session: sqlalchemy.orm.Session = None
     ):
-        user = None
         try:
             user = session.query(User).filter(User.login == login).one()
-        except Exception:
-            pass
-        return user
+        except NoResultFound:
+            password_hash = generate_password_hash(password)
+            new_user = User(
+                login=login,
+                password=password_hash,
+                first_name=first_name,
+                last_name=last_name,
+            )
+            session.add(new_user)
+            session.commit()
+            new_user = session.query(User).filter(User.login == login).one()
+            return {'user_id': new_user.id}
+        else:
+            return Response(
+                "{'result':'user with this login already exists'}",
+                status=400,
+                mimetype='application/json',
+            )

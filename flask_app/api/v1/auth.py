@@ -11,8 +11,8 @@ def create_user():
     return db.register_user(
         login=request.json.get('login'),
         password=request.json.get('password'),
-        last_name=request.json.get('password'),
-        first_name=request.json.get('password'),
+        last_name=request.json.get('last_name'),
+        first_name=request.json.get('first_name'),
     )
 
 
