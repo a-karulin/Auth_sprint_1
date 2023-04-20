@@ -25,4 +25,3 @@ class HistoryService:
         )
         session.add(user_info)
         session.commit()
-
