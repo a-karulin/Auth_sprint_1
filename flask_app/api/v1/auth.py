@@ -7,6 +7,8 @@ from flask_jwt_extended import create_refresh_token
 from database.db import db_session
 from database.db_models import User, History
 from werkzeug.security import check_password_hash, generate_password_hash
+
+from services.history import HistoryService
 from services.user import UserService
 
 auth = Blueprint("auth", __name__)
@@ -27,23 +29,21 @@ def create_user():
 def login_user():
     login = request.form.get("login")
     password = request.form.get("password", None)
-    user = db_session.query(User).filter(User.login == login).one()
+    user_service = UserService()
+    user = user_service.get_user(login)
     if not user:
         return HTTPStatus.NOT_FOUND
     user_id = str(user.id)
-    user_agent = request.headers.get("user-agent", "")
-    user_info = History(
-        user_id=user_id,
-        user_agent=user_agent,
-        auth_date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    )
     hash = generate_password_hash(password)
     if check_password_hash(hash, user.password):
         access_token = create_access_token(identity=user.id, fresh=True)
         refresh_token = create_refresh_token(identity=user.id)
-        db_session.session.add(user_info)
-        db_session.session.commit()
-        db_session.session.remove()
+        history_service = HistoryService()
+        history_service.create_history_record(
+            user_id=user_id,
+            user_agent=request.headers.get("user-agent", ""),
+            auth_date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        )
         return jsonify(
             {
                 "message": "Successful Login",

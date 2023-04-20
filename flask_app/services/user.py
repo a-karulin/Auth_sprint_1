@@ -24,3 +24,13 @@ class UserService:
         except Exception:
             pass
         return user
+
+    @get_session()
+    def get_user(
+            self,
+            login,
+            session: sqlalchemy.orm.Session = None
+    ):
+        """Получить пользователя по логину
+        :param login: логин (e-mail пользователя)"""
+        return session.query(User).filter(User.login == login).one()
