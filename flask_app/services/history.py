@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 import sqlalchemy.orm
 
@@ -21,7 +21,7 @@ class HistoryService:
         user_info = History(
             user_id=user_id,
             user_agent=user_agent,
-            auth_date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+            auth_date=datetime.utcnow().strftime("%Y-%m-%d %H:%M")
         )
         session.add(user_info)
         session.commit()
