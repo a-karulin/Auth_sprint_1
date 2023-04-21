@@ -1,10 +1,7 @@
-import datetime
 from http import HTTPStatus
 
 from flask import Blueprint, request, jsonify
-from werkzeug.security import check_password_hash, generate_password_hash
 
-from services.history import HistoryService
 from services.tokens import create_access_and_refresh_tokens
 from services.user import UserService
 
@@ -31,29 +28,19 @@ def create_user():
 
 @auth.route("/login", methods=["POST"])
 def login_user():
-    login = request.json.get('login')
-    password = request.json.get('password', None)
     user_service = UserService()
-    user = user_service.get_user(login)
-    if not user:
-        return HTTPStatus.NOT_FOUND
-    user_id = str(user.id)
-
-    if check_password_hash(user.password, password):
-        access_token, refresh_token = create_access_and_refresh_tokens({'user_id': user_id})
-        history_service = HistoryService()
-        history_service.create_history_record(
-            user_id=user_id,
-            user_agent=request.headers.get("user-agent", ""),
-        )
-        return jsonify(
-            {
-                "message": "Successful Login",
-                "user": user_id,
-                "access_token": access_token,
-                "refresh_token": refresh_token,
-            })
-    return jsonify({"message": "Wrong password"})
+    user = user_service.login_user(
+        login=request.json.get('login'),
+        password=request.json.get('password', None),
+        user_agent=request.headers.get("user-agent", ""),
+    )
+    access_token, refresh_token = create_access_and_refresh_tokens(user)
+    response = {
+        'access_token': access_token,
+        'refresh_token': refresh_token,
+        'id': user,
+    }
+    return jsonify(response), HTTPStatus.OK
 
 
 @auth.route("/logout")
