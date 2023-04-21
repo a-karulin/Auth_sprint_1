@@ -41,7 +41,7 @@ class UserService:
     @get_session()
     def get_user(
             self,
-            login,
+            login: str,
             session: sqlalchemy.orm.Session = None
     ):
         """Получить пользователя по логину

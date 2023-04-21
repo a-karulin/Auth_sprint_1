@@ -31,28 +31,27 @@ def create_user():
 
 @auth.route("/login", methods=["POST"])
 def login_user():
-    login = request.form.get("login")
-    password = request.form.get("password", None)
+    login = request.json.get('login')
+    password = request.json.get('password', None)
     user_service = UserService()
     user = user_service.get_user(login)
     if not user:
         return HTTPStatus.NOT_FOUND
     user_id = str(user.id)
-    hash = generate_password_hash(password)
-    if check_password_hash(hash, user.password):
+
+    if check_password_hash(user.password, password):
         access_token, refresh_token = create_access_and_refresh_tokens({'user_id': user_id})
         history_service = HistoryService()
         history_service.create_history_record(
             user_id=user_id,
             user_agent=request.headers.get("user-agent", ""),
-            auth_date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
         )
         return jsonify(
             {
                 "message": "Successful Login",
                 "user": user_id,
-                "access_token": access_token.decode("utf-8"),
-                "refresh_token": refresh_token.decode("utf-8"),
+                "access_token": access_token,
+                "refresh_token": refresh_token,
             })
     return jsonify({"message": "Wrong password"})
 
