@@ -1,10 +1,12 @@
+from datetime import datetime
+
 import sqlalchemy.orm
 from flask import abort
 from sqlalchemy.exc import NoResultFound
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from database.db import engine
-from database.db_models import User
+from database.db_models import User, History
 from database.session_decorator import get_session
 
 
@@ -34,6 +36,34 @@ class UserService:
             session.add(new_user)
             session.commit()
             new_user = session.query(User).filter(User.login == login).one()
-            return {'user_id': new_user.id}
+            return new_user.id
         else:
             abort(400)
+
+    @get_session()
+    def login_user(
+            self,
+            login: str,
+            password: str,
+            user_agent: str,
+            session: sqlalchemy.orm.Session = None
+    ):
+        """Получить пользователя по логину
+        :param login: логин (e-mail пользователя)"""
+
+        try:
+            user = session.query(User).filter(User.login == login).one()
+        except NoResultFound:
+            abort(404)
+        else:
+            if check_password_hash(user.password, password):
+                user_info = History(
+                    user_id=user.id,
+                    user_agent=user_agent,
+                    auth_date=datetime.utcnow().strftime("%Y-%m-%d %H:%M")
+                )
+                session.add(user_info)
+                session.commit()
+
+                return user.id
+            abort(403)

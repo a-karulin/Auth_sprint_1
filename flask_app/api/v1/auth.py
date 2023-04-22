@@ -28,7 +28,19 @@ def create_user():
 
 @auth.route("/login", methods=["POST"])
 def login_user():
-    pass
+    user_service = UserService()
+    user = user_service.login_user(
+        login=request.json.get('login'),
+        password=request.json.get('password', None),
+        user_agent=request.headers.get("user-agent", ""),
+    )
+    access_token, refresh_token = create_access_and_refresh_tokens(user)
+    response = {
+        'access_token': access_token,
+        'refresh_token': refresh_token,
+        'id': user,
+    }
+    return jsonify(response), HTTPStatus.OK
 
 
 @auth.route("/logout")

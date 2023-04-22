@@ -12,22 +12,41 @@ tags:
 paths:
   /api/v1/auth/signup:
     post:
-      summary: Регистрация нового пользователя
+      summary: 'Регистрация нового пользователя'
 
   /api/v1/auth/login:
     post:
-      summary: Вход в учетную запись
+      summary: 'Вход в учетную запись'
+      tags:
+        - login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                password:
+                  type: string
+        responses:
+          '200':
+            description: 'Success login'
+          '401':
+            description: 'Auth failed'
+
 
   /api/v1/auth/logout:
     post:
-      summary: Выход из учетной записи
+      summary: 'Выход из учетной записи'
 
   /api/v1/auth/refresh:
     post:
-      summary: Обновление токена
+      summary: 'Обновление токена'
 
   /api/v1/auth/change-password:
     post:
-      summary: Изменить пароль
+      summary: 'Изменить пароль'
 
   
