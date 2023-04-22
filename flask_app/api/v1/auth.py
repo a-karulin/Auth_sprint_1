@@ -1,11 +1,26 @@
 from http import HTTPStatus
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 
 from services.tokens import create_access_and_refresh_tokens
 from services.user import UserService
 
 auth = Blueprint("auth", __name__)
+
+
+@auth.errorhandler(404)
+def handle_not_found(error):
+    return make_response(jsonify({'error': 'Not found'}), HTTPStatus.NOT_FOUND)
+
+
+@auth.errorhandler(400)
+def handle_bad_request(error):
+    return make_response(jsonify({'error': 'No result found'}), HTTPStatus.NOT_FOUND)
+
+
+@auth.errorhandler(403)
+def handle_bad_request(error):
+    return make_response(jsonify({'error': 'Not authorized'}), HTTPStatus.NOT_FOUND)
 
 
 @auth.route("/signup", methods=["POST"])
