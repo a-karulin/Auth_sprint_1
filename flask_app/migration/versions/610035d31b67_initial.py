@@ -21,13 +21,24 @@ def upgrade() -> None:
     # op.execute("create schema auth")
     op.create_table(
         'users',
-        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('id', sa.UUID(), nullable=False),
         sa.Column('login', sa.String(length=255), nullable=False),
         sa.Column('password', sa.String(length=255), nullable=False),
         sa.Column('first_name', sa.String(length=255), nullable=False),
         sa.Column('last_name', sa.String(length=255), nullable=False),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('login'),
+    )
+
+    op.create_table(
+        'history',
+        sa.Column('id', sa.UUID(), nullable=False),
+        sa.Column('user_id', sa.UUID(), nullable=False),
+        sa.Column('user_agent', sa.String(length=255), nullable=False),
+        sa.Column('auth_date', sa.DateTime(), nullable=False),
+        sa.PrimaryKeyConstraint('id'),
+        sa.ForeignKeyConstraint(['user_id'], ['users.id'],
+                                name='history_fkey'),
     )
 
 

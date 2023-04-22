@@ -1,8 +1,13 @@
 from datetime import timedelta
 
-from flask import Blueprint, jsonify
 from flask_jwt_extended import get_jwt, jwt_required
 import redis
+from http import HTTPStatus
+
+from flask import Blueprint, request, jsonify
+
+from services.tokens import create_access_and_refresh_tokens
+from services.user import UserService
 
 auth = Blueprint("auth", __name__)
 
@@ -18,12 +23,37 @@ ACCESS_EXPIRES = timedelta(hours=1)
 
 @auth.route("/signup", methods=["POST"])
 def create_user():
-    pass
+    db = UserService()
+    new_user = db.register_user(
+        login=request.json.get('login'),
+        password=request.json.get('password'),
+        last_name=request.json.get('last_name'),
+        first_name=request.json.get('first_name'),
+    )
+    access_token, refresh_token = create_access_and_refresh_tokens(new_user)
+    response = {
+        'access_token': access_token,
+        'refresh_token': refresh_token,
+        'id': new_user,
+    }
+    return jsonify(response), HTTPStatus.CREATED
 
 
 @auth.route("/login", methods=["POST"])
 def login_user():
-    pass
+    user_service = UserService()
+    user = user_service.login_user(
+        login=request.json.get('login'),
+        password=request.json.get('password', None),
+        user_agent=request.headers.get("user-agent", ""),
+    )
+    access_token, refresh_token = create_access_and_refresh_tokens(user)
+    response = {
+        'access_token': access_token,
+        'refresh_token': refresh_token,
+        'id': user,
+    }
+    return jsonify(response), HTTPStatus.OK
 
 
 @auth.route("/logout", methods=["DELETE"])
@@ -39,7 +69,7 @@ def logout():
 
 
 @auth.route("/refresh", methods=["POST"])
-def refresh_token():
+def refresh_tokens():
     pass
 
 
