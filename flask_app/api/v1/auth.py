@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from flask_jwt_extended import get_jwt, jwt_required
+from flask_jwt_extended import get_jwt, jwt_required, get_jwt_identity, get_current_user
 import redis
 from http import HTTPStatus
 
@@ -63,14 +63,27 @@ def logout():
     jti = token["jti"]
     ttype = token["type"]
     jwt_redis_blocklist.set(jti, "", ex=ACCESS_EXPIRES)
+    response = {'msg': f"{ttype.capitalize()} token successfully revoked"}
 
     # Returns "Access token revoked" or "Refresh token revoked"
-    return jsonify(msg=f"{ttype.capitalize()} token successfully revoked")
+    return jsonify(response), HTTPStatus.OK
 
 
 @auth.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)
 def refresh_tokens():
-    pass
+    user = get_current_user()
+    user_id = user.id
+    token = get_jwt()
+    jti = token["jti"]
+    jwt_redis_blocklist.set(jti, "", ex=ACCESS_EXPIRES)
+    access_token, refresh_token = create_access_and_refresh_tokens(user_id)
+    response = {
+        'access_token': access_token,
+        'refresh_token': refresh_token,
+        'id': user_id,
+    }
+    return jsonify(response), HTTPStatus.OK
 
 
 @auth.route("/update-data", methods=["POST"])
