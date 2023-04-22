@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from flask_jwt_extended import get_jwt, jwt_required, get_jwt_identity, get_current_user
+from flask_jwt_extended import get_jwt, jwt_required, get_current_user
 import redis
 from http import HTTPStatus
 
