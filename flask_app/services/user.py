@@ -67,3 +67,6 @@ class UserService:
 
                 return user.id
             abort(403)
+
+    def logout_user(self):
+        pass
