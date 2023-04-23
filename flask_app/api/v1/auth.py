@@ -1,12 +1,9 @@
-from datetime import timedelta
-
 from flask_jwt_extended import get_jwt, jwt_required, get_current_user
-import redis
 from http import HTTPStatus
 
 from flask import Blueprint, request, jsonify
 
-from services.tokens import create_access_and_refresh_tokens
+from services.tokens import create_access_and_refresh_tokens, RedisTokenStorage
 from services.user import UserService
 
 auth = Blueprint("auth", __name__)
@@ -14,11 +11,6 @@ auth = Blueprint("auth", __name__)
 # Setup our redis connection for storing the blocklisted tokens. You will probably
 # want your redis instance configured to persist data to disk, so that a restart
 # does not cause your application to forget that a JWT was revoked.
-jwt_redis_blocklist = redis.StrictRedis(
-    host="localhost", port=6379, db=0, decode_responses=True
-)
-
-ACCESS_EXPIRES = timedelta(hours=1)
 
 
 @auth.route("/signup", methods=["POST"])
@@ -60,13 +52,9 @@ def login_user():
 @jwt_required()
 def logout():
     token = get_jwt()
-    jti = token["jti"]
-    ttype = token["type"]
-    jwt_redis_blocklist.set(jti, "", ex=ACCESS_EXPIRES)
-    response = {'msg': f"{ttype.capitalize()} token successfully revoked"}
-
-    # Returns "Access token revoked" or "Refresh token revoked"
-    return jsonify(response), HTTPStatus.OK
+    redis_storage = RedisTokenStorage()
+    redis_storage.add_refresh_token_to_blocklist(token)
+    return jsonify({'msg': 'token successfully revoked'}), HTTPStatus.OK
 
 
 @auth.route("/refresh", methods=["POST"])
@@ -75,15 +63,17 @@ def refresh_tokens():
     user = get_current_user()
     user_id = user.id
     token = get_jwt()
-    jti = token["jti"]
-    jwt_redis_blocklist.set(jti, "", ex=ACCESS_EXPIRES)
-    access_token, refresh_token = create_access_and_refresh_tokens(user_id)
-    response = {
-        'access_token': access_token,
-        'refresh_token': refresh_token,
-        'id': user_id,
-    }
-    return jsonify(response), HTTPStatus.OK
+    redis_storage = RedisTokenStorage()
+    if redis_storage.check_token_in_blacklist(token):
+        redis_storage.add_refresh_token_to_blocklist(token)
+        access_token, refresh_token = create_access_and_refresh_tokens(user_id)
+        response = {
+            'access_token': access_token,
+            'refresh_token': refresh_token,
+            'id': user_id,
+        }
+        return jsonify(response), HTTPStatus.OK
+    return jsonify({'msg': 'invalid token'}), HTTPStatus.UNAUTHORIZED
 
 
 @auth.route("/update-data", methods=["POST"])
