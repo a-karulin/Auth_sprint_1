@@ -1,4 +1,4 @@
-from flask_jwt_extended import get_jwt, jwt_required, get_current_user
+from flask_jwt_extended import get_jwt, jwt_required
 from http import HTTPStatus
 
 from flask import Blueprint, request, jsonify, make_response
