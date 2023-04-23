@@ -15,11 +15,11 @@ paths:
       summary: Регистрация нового пользователя
       tags:
         - sign up
-        requestBody:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
         responses:
           '201':
             description: Пользователь создан
@@ -54,14 +54,14 @@ paths:
       summary: Выход из учетной записи
       tags:
         - logout
-        responses:
-          '200':
-            description: 'Success logout'
-          '401':
-            description: 'Auth failed'
-        security:
-          - AccessToken: [ ]
-          - RefreshToken: [ ]
+      responses:
+        '200':
+          description: 'Success logout'
+        '401':
+          description: 'Auth failed'
+      security:
+        - AccessToken: [ ]
+        - RefreshToken: [ ]
 
   /api/v1/auth/refresh:
     post:
@@ -86,18 +86,18 @@ components:
   schemas:
     User:
       type: object
-        required:
-          - login
-          - password
-          - first_name
-          - last_name
-        properties:
-          login:
-            type: string
-          password:
-            type: string
-          first_name:
-            type: string
-          last_name:
-            type: string
+      required:
+        - login
+        - password
+        - first_name
+        - last_name
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
   
