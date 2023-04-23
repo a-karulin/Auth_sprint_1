@@ -26,7 +26,7 @@ class RedisTokenStorage:
             host=self.redis_host, port=self.redis_port, db=0, decode_responses=True
         )
 
-    def add_refresh_token_to_blocklist(self, token):
+    def add_refresh_token_to_blacklist(self, token):
         jti = token["jti"]
         iat = token.get('iat')
         exp = token.get('exp')

@@ -68,24 +68,22 @@ def login_user():
 def logout():
     token = get_jwt()
     redis_storage = RedisTokenStorage()
-    redis_storage.add_refresh_token_to_blocklist(token)
+    redis_storage.add_refresh_token_to_blacklist(token)
     return jsonify({'msg': 'token successfully revoked'}), HTTPStatus.OK
 
 
 @auth.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)
 def refresh_tokens():
-    user = get_current_user()
-    user_id = user.id
     token = get_jwt()
+    user_id = token.get('sub')
     redis_storage = RedisTokenStorage()
-    if redis_storage.check_token_in_blacklist(token):
-        redis_storage.add_refresh_token_to_blocklist(token)
+    if redis_storage.check_token_in_blacklist(token) is None:
+        redis_storage.add_refresh_token_to_blacklist(token)
         access_token, refresh_token = create_access_and_refresh_tokens(user_id)
         response = {
             'access_token': access_token,
             'refresh_token': refresh_token,
-            'id': user_id,
         }
         return jsonify(response), HTTPStatus.OK
     return jsonify({'msg': 'invalid token'}), HTTPStatus.UNAUTHORIZED
