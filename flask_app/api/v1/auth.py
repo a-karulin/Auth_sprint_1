@@ -19,7 +19,7 @@ def handle_bad_request(error):
 
 
 @auth.errorhandler(403)
-def handle_bad_request(error):
+def handle_non_authorized_request(error):
     return make_response(jsonify({'error': 'Not authorized'}), HTTPStatus.NOT_FOUND)
 
 
