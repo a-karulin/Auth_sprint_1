@@ -6,7 +6,7 @@ from sqlalchemy.exc import NoResultFound
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from database.db import engine
-from database.db_models import User, History
+from database.db_models import User, History, Roles, UsersRoles
 from database.session_decorator import get_session
 
 
@@ -67,3 +67,29 @@ class UserService:
 
                 return user.id
             abort(403)
+
+    @get_session()
+    def get_user(
+            self,
+            user_id,
+            session: sqlalchemy.orm.Session = None
+    ):
+        try:
+            user = session.query(User).filter(id=user_id).one()
+            return user
+        except NoResultFound:
+            abort(404)
+
+    @get_session()
+    def apply_user_role(
+            self,
+            user_id,
+            role: Roles,
+            session: sqlalchemy.orm.Session = None
+    ):
+        user_role = session.query(UsersRoles).filter(user_id=user_id, role_id=role.id).one()
+        if user_role:
+            return {"msg": "User has this role"}
+        new_user_role = UsersRoles(user_id=user_id, role_id=role.id)
+        session.add(new_user_role)
+        session.commit()
