@@ -1,4 +1,6 @@
-from flask import Blueprint, request
+from http import HTTPStatus
+
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import get_jwt_identity
 
 from database.db_models import User, Roles
@@ -16,23 +18,26 @@ def get_user_roles():
     return [Roles(name=role.name) for role in user.roles]
 
 
-@users.route("/apply-roles", methods=["POST"])
+@users.route("/{user_id}/apply-roles", methods=["POST"])
 def apply_roles():
     role_service = RoleService()
     role = role_service.get_role(request.json.get('role_name'))
-    identity = get_jwt_identity()
     user_service = UserService()
-    user_service.apply_user_role(identity, role)
+    user_id = request.args.get('user_id')
+    response = user_service.apply_user_role(user_id, role)
 
-    new_role_user = UserRole(user_id=body.user_id, role_id=body.role_id)
-    db.session.add(new_role_user)
-    db.session.commit()
-    return {"msg": "Role is assigned to the user"}, HTTPStatus.CREATED
+    return jsonify(response), HTTPStatus.OK
 
 
 @users.route("/{user_id}/delete_role", methods=["DELETE"])
 def delete_user_from_role():
-    pass
+    role_service = RoleService()
+    role = role_service.get_role(request.json.get('role_name'))
+    user_service = UserService()
+    user_id = request.args.get('user_id')
+    response = user_service.delete_user_role(user_id, role)
+
+    return jsonify(response), HTTPStatus.OK
 
 
 @users.route("/{user_id}/roles", methods=["GET"])
