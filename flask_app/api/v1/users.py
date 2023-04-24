@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
 
 from database.db_models import User, Roles
 from services.role import RoleService
@@ -14,7 +14,7 @@ users = Blueprint("users", __name__)
 def get_user_roles():
     identity = get_jwt_identity()
     user_service = UserService()
-    user = user_service.get_user(user_id=identity)
+    user = user_service.get_user(identity)
     return [Roles(name=role.name) for role in user.roles]
 
 
@@ -43,3 +43,14 @@ def delete_user_from_role():
 @users.route("/{user_id}/roles", methods=["GET"])
 def get_user_history():
     pass
+
+
+@users.route("/login-history", methods=["GET"])
+@jwt_required()
+def get_login_history():
+    token = get_jwt()
+    user_id = token.get('sub')
+    user_service = UserService()
+    return jsonify(
+        {'history': [user_service.get_login_history(user_id)]}
+    ), HTTPStatus.OK

@@ -113,3 +113,13 @@ class UserService:
         session.add(new_user_role)
         session.commit()
         return {"msg": "Deleted role for user"}
+
+    def get_login_history(self, user_id, session: sqlalchemy.orm.Session = None):
+        query = session.query(History).filter(History.user_id == user_id).all()
+        result = dict()
+        for row in query:
+            result[str(row.auth_date)] = row.user_agent
+        return result
+
+    def logout_user(self):
+        pass
