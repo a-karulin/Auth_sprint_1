@@ -89,8 +89,28 @@ class UserService:
         except NoResultFound:
             abort(404)
         else:
-            if check_password_hash(user.password, old_password):
+            if user and check_password_hash(user.password, old_password):
                 user.password = generate_password_hash(new_password)
+                session.commit()
+                user = session.query(User).filter(User.id == user_id).one()
+                return user
+            abort(401)
+
+    @get_session()
+    def change_login(
+            self,
+            user_id,
+            password,
+            new_login,
+            session: sqlalchemy.orm.Session = None,
+    ):
+        try:
+            user = session.query(User).filter(User.id == user_id).one()
+        except NoResultFound:
+            abort(404)
+        else:
+            if user and check_password_hash(user.password, password):
+                user.login = new_login
                 session.commit()
                 user = session.query(User).filter(User.id == user_id).one()
                 return user

@@ -39,10 +39,22 @@ def get_login_history():
 def change_password():
     token = get_jwt()
     user_service = UserService()
-    user_id = token.get('sub')  # TODO: add payload
     user_service.change_password(
-        user_id=user_id,
+        user_id=token.get('sub'),  # TODO: add payload,
         old_password=request.json.get('old_password'),
         new_password=request.json.get('new_password'),
     )
     return jsonify({'msg': 'password updated'}), HTTPStatus.OK
+
+
+@users.route("/change-login", methods=["POST"])
+@jwt_required()
+def change_login():
+    token = get_jwt()
+    user_service = UserService()
+    user_service.change_login(
+        user_id=token.get('sub'),  # TODO: add payload
+        new_login=request.json.get('new_login'),
+        password=request.json.get('password'),
+    )
+    return jsonify({'msg': 'login updated'}), HTTPStatus.OK
