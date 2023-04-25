@@ -98,6 +98,64 @@ paths:
       security:
         - AccessToken: [ ]
 
+  /api/v1/users/{user_id}/apply_roles:
+    post:
+      summary: 'Применение роли пользователю'
+      parameters:
+        - name: user_id
+          in: query
+          description: 'ид пользователя'
+          required: true
+          schema:
+            type: int
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role_name:
+                  type: string
+      responses:
+        '200':
+          description: 'Роль применена'
+        '403':
+          description: 'Нет прав'
+        '404':
+          description: 'Роль или пользователь не найдены'
+      security:
+        - AccessToken: [ ]
+
+  /api/v1/users/{user_id}/delete_role:
+    post:
+      summary: 'Удаление роли у пользователя'
+      parameters:
+        - name: user_id
+          in: query
+          description: 'ид пользователя'
+          required: true
+          schema:
+            type: int
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role_name:
+                  type: string
+      responses:
+        '200':
+          description: 'Роль удалена'
+        '403':
+          description: 'Нет прав'
+        '404':
+          description: 'Роль или пользователь не найдены'
+      security:
+        - AccessToken: [ ]
+
 
 components:
   securitySchemes:

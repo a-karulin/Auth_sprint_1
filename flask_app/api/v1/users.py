@@ -18,7 +18,7 @@ def get_user_roles():
     return [Roles(name=role.name) for role in user.roles]
 
 
-@users.route("/{user_id}/apply-roles", methods=["POST"])
+@users.route("/{user_id}/apply_roles", methods=["POST"])
 def apply_roles():
     current_user_id = get_jwt_identity()
     role_service = RoleService()
