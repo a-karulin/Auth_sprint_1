@@ -89,8 +89,13 @@ class UserService:
             self,
             user_id,
             role: Roles,
+            admin_id,
+            admin_role: Roles,
             session: sqlalchemy.orm.Session = None
     ):
+        admin_user_role = session.query(UsersRoles).filter(user_id=admin_id, role_id=admin_role.id).first()
+        if admin_user_role:
+            return {"msg": "You don't have credentials for role assignment"}
         user_role = session.query(UsersRoles).filter(user_id=user_id, role_id=role.id).first()
         if user_role:
             return {"msg": "User has this role"}
@@ -104,8 +109,13 @@ class UserService:
             self,
             user_id,
             role: Roles,
+            admin_id,
+            admin_role: Roles,
             session: sqlalchemy.orm.Session = None
     ):
+        admin_user_role = session.query(UsersRoles).filter(user_id=admin_id, role_id=admin_role.id).first()
+        if admin_user_role:
+            return {"msg": "You don't have credentials for role exclusion"}
         user_role = session.query(UsersRoles).filter(user_id=user_id, role_id=role.id).first()
         if not user_role:
             return {"msg": "User doesn't have this role"}

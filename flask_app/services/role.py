@@ -22,4 +22,3 @@ class RoleService:
             return role
         except NoResultFound:
             abort(404)
-

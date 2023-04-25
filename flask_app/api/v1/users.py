@@ -3,7 +3,7 @@ from http import HTTPStatus
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
 
-from database.db_models import User, Roles
+from database.db_models import Roles
 from services.role import RoleService
 from services.user import UserService
 
@@ -20,11 +20,13 @@ def get_user_roles():
 
 @users.route("/{user_id}/apply-roles", methods=["POST"])
 def apply_roles():
+    current_user_id = get_jwt_identity()
     role_service = RoleService()
+    admin_role = role_service.get_role("admin")
     role = role_service.get_role(request.json.get('role_name'))
     user_service = UserService()
     user_id = request.args.get('user_id')
-    response = user_service.apply_user_role(user_id, role)
+    response = user_service.apply_user_role(user_id, role, current_user_id, admin_role)
 
     return jsonify(response), HTTPStatus.OK
 
