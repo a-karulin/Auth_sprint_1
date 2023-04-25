@@ -76,5 +76,45 @@ class UserService:
             result[str(row.auth_date)] = row.user_agent
         return result
 
+    @get_session()
+    def change_password(
+            self,
+            user_id,
+            old_password,
+            new_password,
+            session: sqlalchemy.orm.Session = None,
+    ):
+        try:
+            user = session.query(User).filter(User.id == user_id).one()
+        except NoResultFound:
+            abort(404)
+        else:
+            if user and check_password_hash(user.password, old_password):
+                user.password = generate_password_hash(new_password)
+                session.commit()
+                user = session.query(User).filter(User.id == user_id).one()
+                return user
+            abort(401)
+
+    @get_session()
+    def change_login(
+            self,
+            user_id,
+            password,
+            new_login,
+            session: sqlalchemy.orm.Session = None,
+    ):
+        try:
+            user = session.query(User).filter(User.id == user_id).one()
+        except NoResultFound:
+            abort(404)
+        else:
+            if user and check_password_hash(user.password, password):
+                user.login = new_login
+                session.commit()
+                user = session.query(User).filter(User.id == user_id).one()
+                return user
+            abort(401)
+
     def logout_user(self):
         pass
