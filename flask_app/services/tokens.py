@@ -1,10 +1,27 @@
 from datetime import timedelta
+from http import HTTPStatus
 
 import redis
-from flask_jwt_extended import create_access_token
+from flask import jsonify
+from flask_jwt_extended import create_access_token, verify_jwt_in_request, get_jwt
 from flask_jwt_extended import create_refresh_token
 
 from config import redis_config
+
+
+def admin_access():
+    def wrapper(func):
+        def inner(*args, **kwargs):
+            verify_jwt_in_request()
+            additional_claims = get_jwt()
+            if additional_claims['is_admin']:
+                return func(*args, **kwargs)
+            else:
+                return jsonify(msg='Access only for admins'), HTTPStatus.FORBIDDEN
+
+        return inner
+
+    return wrapper
 
 
 def create_access_and_refresh_tokens(
