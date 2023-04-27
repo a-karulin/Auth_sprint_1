@@ -1,4 +1,5 @@
 from datetime import timedelta
+from functools import wraps
 from http import HTTPStatus
 
 import redis
@@ -10,7 +11,8 @@ from config import redis_config
 
 
 def admin_access():
-    def wrapper(func):
+    def outer(func):
+        @wraps(func)
         def inner(*args, **kwargs):
             verify_jwt_in_request()
             additional_claims = get_jwt()
@@ -21,7 +23,7 @@ def admin_access():
 
         return inner
 
-    return wrapper
+    return outer
 
 
 def create_access_and_refresh_tokens(
