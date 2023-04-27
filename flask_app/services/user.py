@@ -37,7 +37,8 @@ class UserService:
             session.add(new_user)
             session.commit()
             new_user = session.query(User).filter(User.login == login).one()
-            return new_user.id
+            new_user = self.get_user_fields(new_user)
+            return new_user
         else:
             abort(400)
 
@@ -66,8 +67,17 @@ class UserService:
                 session.add(user_info)
                 session.commit()
 
-                return user.id
+                user = self.get_user_fields(user)
+                return user
             abort(403)
+
+    def get_user_fields(self, user):
+        return {
+            'id': user.id,
+            'login': user.login,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+        }
 
     @get_session()
     def get_user(
