@@ -5,6 +5,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
 
 from database.db_models import Roles
 from services.role import RoleService
+from services.tokens import admin_access
 from services.user import UserService
 
 users = Blueprint("users", __name__)
@@ -20,16 +21,15 @@ def get_user_roles():
     return jsonify({'roles': roles}), HTTPStatus.OK
 
 
-@users.route("/{user_id}/apply_roles", methods=["POST"])
+@users.route("/apply-role", methods=["POST"])
+@admin_access()
 @jwt_required()
-def apply_roles():
-    current_user_id = get_jwt_identity()
+def apply_role():
     role_service = RoleService()
-    admin_role = role_service.get_role("admin")
-    role = role_service.get_role(request.json.get('role_name'))
-    user_service = UserService()
-    user_id = request.args.get('user_id')
-    response = user_service.apply_user_role(user_id, role, current_user_id, admin_role)
+    response = role_service.apply_user_role(
+        user_id=request.json.get('user_id'),
+        role_id=request.json.get('role_id'),
+    )
 
     return jsonify(response), HTTPStatus.OK
 

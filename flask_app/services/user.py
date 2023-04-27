@@ -88,46 +88,6 @@ class UserService:
         roles = session.query(UsersRoles).filter(UsersRoles.user_id == user.id).all()
         return [self._transform_query_to_dict(role) for role in roles]
 
-    @get_session()
-    def apply_user_role(
-            self,
-            user_id,
-            role: Roles,
-            admin_id,
-            admin_role: Roles,
-            session: sqlalchemy.orm.Session = None
-    ):
-        admin_user_role = session.query(UsersRoles).filter(user_id=admin_id, role_id=admin_role.id).first()
-        if admin_user_role:
-            return {"msg": "You don't have credentials for role assignment"}
-        user_role = session.query(UsersRoles).filter(user_id=user_id, role_id=role.id).first()
-        if user_role:
-            return {"msg": "User has this role"}
-        new_user_role = UsersRoles(user_id=user_id, role_id=role.id)
-        session.add(new_user_role)
-        session.commit()
-        return {"msg": "Applied role for user"}
-
-    @get_session()
-    def delete_user_role(
-            self,
-            user_id,
-            role: Roles,
-            admin_id,
-            admin_role: Roles,
-            session: sqlalchemy.orm.Session = None
-    ):
-        admin_user_role = session.query(UsersRoles).filter(user_id=admin_id, role_id=admin_role.id).first()
-        if admin_user_role:
-            return {"msg": "You don't have credentials for role exclusion"}
-        user_role = session.query(UsersRoles).filter(user_id=user_id, role_id=role.id).first()
-        if not user_role:
-            return {"msg": "User doesn't have this role"}
-        new_user_role = UsersRoles(user_id=user_id, role_id=role.id)
-        session.add(new_user_role)
-        session.commit()
-        return {"msg": "Deleted role for user"}
-
     def get_login_history(self, user_id, session: sqlalchemy.orm.Session = None):
         query = session.query(History).filter(History.user_id == user_id).all()
         result = dict()
