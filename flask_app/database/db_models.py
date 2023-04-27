@@ -1,6 +1,6 @@
 # flask_app/db_models.py
 import uuid
-from sqlalchemy import Column, String, ForeignKey, DateTime
+from sqlalchemy import Column, String, ForeignKey, DateTime, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from database.db import Base
 
@@ -13,6 +13,7 @@ class User(Base):
     password = Column(String, nullable=False)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
+    is_admin = Column(Boolean, default=False)
 
 
 class Roles(Base):
