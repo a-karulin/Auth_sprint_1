@@ -11,14 +11,17 @@ users = Blueprint("users", __name__)
 
 
 @users.route("/roles", methods=["GET"])
+@jwt_required()
 def get_user_roles():
     identity = get_jwt_identity()
     user_service = UserService()
     user = user_service.get_user(identity)
-    return [Roles(name=role.name) for role in user.roles]
+    roles = user_service.get_roles_of_user(user)
+    return {'roles': roles}
 
 
 @users.route("/{user_id}/apply_roles", methods=["POST"])
+@jwt_required()
 def apply_roles():
     current_user_id = get_jwt_identity()
     role_service = RoleService()
@@ -32,6 +35,7 @@ def apply_roles():
 
 
 @users.route("/{user_id}/delete_role", methods=["DELETE"])
+@jwt_required()
 def delete_user_from_role():
     role_service = RoleService()
     role = role_service.get_role(request.json.get('role_name'))

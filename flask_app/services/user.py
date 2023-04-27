@@ -82,17 +82,19 @@ class UserService:
     @get_session()
     def get_user(
             self,
-            user_data: Union[str, int],
-            session: sqlalchemy.orm.Session = None
+            user_id: str,
+            session: sqlalchemy.orm.Session = None,
     ):
         try:
-            if isinstance(user_data, str):
-                user = session.query(User).filter(login=user_data).one()
-            else:
-                user = session.query(User).filter(id=user_data).one()
+            user = session.query(User).filter(User.id == user_id).one()
             return user
         except NoResultFound:
             abort(404)
+
+    @get_session()
+    def get_roles_of_user(self, user: User, session: sqlalchemy.orm.Session = None):
+        roles = session.query(UsersRoles).filter(UsersRoles.user_id == user.id).all()
+        return [self._transform_query_to_dict(role) for role in roles]
 
     @get_session()
     def apply_user_role(
@@ -181,5 +183,9 @@ class UserService:
                 return user
             abort(401)
 
-    def logout_user(self):
-        pass
+    @staticmethod
+    def _transform_query_to_dict(row) -> dict:
+        query_as_dict = {}
+        for column in row.__table__.columns:
+            query_as_dict[column.name] = getattr(row, column.name)
+        return query_as_dict
