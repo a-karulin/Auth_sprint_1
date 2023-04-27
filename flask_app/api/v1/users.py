@@ -24,26 +24,27 @@ def get_user_roles():
 @users.route("/apply-role", methods=["POST"])
 @admin_access()
 @jwt_required()
-def apply_role():
+def apply_role_to_user():
     role_service = RoleService()
-    response = role_service.apply_user_role(
+    role_service.apply_user_role(
         user_id=request.json.get('user_id'),
         role_id=request.json.get('role_id'),
     )
 
-    return jsonify(response), HTTPStatus.OK
+    return jsonify({'msg': 'role created'}), HTTPStatus.OK
 
 
-@users.route("/{user_id}/delete_role", methods=["DELETE"])
+@users.route("/delete-role", methods=["DELETE"])
+@admin_access()
 @jwt_required()
-def delete_user_from_role():
+def delete_role_from_user():
     role_service = RoleService()
-    role = role_service.get_role(request.json.get('role_name'))
-    user_service = UserService()
-    user_id = request.args.get('user_id')
-    response = user_service.delete_user_role(user_id, role)
+    role_service.delete_user_role(
+        user_id=request.json.get('user_id'),
+        role_id=request.json.get('role_id'),
+    )
 
-    return jsonify(response), HTTPStatus.OK
+    return jsonify({'msg': 'role deleted'}), HTTPStatus.OK
 
 
 @users.route("/{user_id}/roles", methods=["GET"])

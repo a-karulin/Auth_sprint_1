@@ -22,7 +22,7 @@ class RoleService:
             session.query(UsersRoles).filter(
                 UsersRoles.user_id == user_id,
                 UsersRoles.role_id == role_id,
-            ).all()
+            ).one()
         except NoResultFound:
             new_role = UsersRoles(user_id=user_id, role_id=role_id)
             session.add(new_role)
@@ -33,22 +33,19 @@ class RoleService:
     @get_session()
     def delete_user_role(
             self,
-            user_id,
-            role: Roles,
-            admin_id,
-            admin_role: Roles,
+            user_id: str,
+            role_id: str,
             session: sqlalchemy.orm.Session = None
     ):
-        admin_user_role = session.query(UsersRoles).filter(user_id=admin_id, role_id=admin_role.id).first()
-        if admin_user_role:
-            return {"msg": "You don't have credentials for role exclusion"}
-        user_role = session.query(UsersRoles).filter(user_id=user_id, role_id=role.id).first()
-        if not user_role:
-            return {"msg": "User doesn't have this role"}
-        new_user_role = UsersRoles(user_id=user_id, role_id=role.id)
-        session.add(new_user_role)
-        session.commit()
-        return {"msg": "Deleted role for user"}
+        try:
+            role = session.query(UsersRoles).filter(
+                UsersRoles.user_id == user_id,
+                UsersRoles.role_id == role_id,
+            ).one()
+            session.delete(role)
+            session.commit()
+        except NoResultFound:
+            abort(409)
 
     @get_session()
     def get_role(
