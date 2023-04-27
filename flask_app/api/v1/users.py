@@ -17,7 +17,7 @@ def get_user_roles():
     user_service = UserService()
     user = user_service.get_user(identity)
     roles = user_service.get_roles_of_user(user)
-    return {'roles': roles}
+    return jsonify({'roles': roles}), HTTPStatus.OK
 
 
 @users.route("/{user_id}/apply_roles", methods=["POST"])
