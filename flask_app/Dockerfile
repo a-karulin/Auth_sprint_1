@@ -13,4 +13,4 @@ EXPOSE 5000
 COPY . .
 
 CMD python3 -m flask --app wsgi_app run --with-threads --reload --host=0.0.0.0
-CMD python3 create-superuser admin@admin.com admin admin admin
+CMD flask create-superuser admin@admin.com admin admin admin
