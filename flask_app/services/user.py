@@ -110,6 +110,14 @@ class UserService:
                 return user
             abort(401)
 
+    @get_session()
+    def get_login_history(self, user_id, session: sqlalchemy.orm.Session = None):
+        query = session.query(History).filter(History.user_id == user_id).all()
+        result = dict()
+        for row in query:
+            result[str(row.auth_date)] = row.user_agent
+        return result
+
     @staticmethod
     def _transform_query_to_dict(row) -> dict:
         query_as_dict = {}

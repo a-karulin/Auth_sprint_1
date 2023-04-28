@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 from flask import Blueprint, request, jsonify, make_response
 
-from services.tokens import create_access_and_refresh_tokens, RedisTokenStorage
+from services.tokens import create_access_and_refresh_tokens, RedisTokenStorage, validate_access_token
 from services.user import UserService
 
 auth = Blueprint("auth", __name__)
@@ -71,10 +71,11 @@ def login_user():
 
 @auth.route("/logout", methods=["DELETE"])
 @jwt_required()
+@validate_access_token()
 def logout():
     token = get_jwt()
     redis_storage = RedisTokenStorage()
-    redis_storage.add_refresh_token_to_blacklist(token)
+    redis_storage.add_token_to_blacklist(token)
     return jsonify({'msg': 'token successfully revoked'}), HTTPStatus.OK
 
 
@@ -85,7 +86,7 @@ def refresh_tokens():
     user_id = token.get('sub')
     redis_storage = RedisTokenStorage()
     if redis_storage.check_token_in_blacklist(token) is None:
-        redis_storage.add_refresh_token_to_blacklist(token)
+        redis_storage.add_token_to_blacklist(token)
         access_token, refresh_token = create_access_and_refresh_tokens(user_id)
         response = {
             'access_token': access_token,
