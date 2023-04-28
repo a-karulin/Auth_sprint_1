@@ -24,8 +24,8 @@ def roles_list():
 @admin_access()
 def create_role():
     role_service = RoleService()
-    response, http_status = role_service.create_role(request.json.get('role'))
-    return jsonify(response), http_status
+    role_service.create_role(request.json.get('role'))
+    return jsonify({"msg": "Created new role"}), HTTPStatus.CREATED
 
 
 @roles.route("/<role_id>", methods=["PATCH"])

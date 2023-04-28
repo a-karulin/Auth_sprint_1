@@ -82,10 +82,9 @@ class RoleService:
             session: sqlalchemy.orm.Session = None
     ):
         if session.query(Roles).filter(Roles.role == role_name).first():
-            return {"msg": "Role exists in database"}, HTTPStatus.CONFLICT
+            abort(409)
         session.add(Roles(role=role_name))
         session.commit()
-        return {"msg": "Created new role"}, HTTPStatus.CREATED
 
     @get_session()
     def update_role(
