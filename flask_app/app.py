@@ -30,6 +30,10 @@ swagger_blueprint = get_swaggerui_blueprint(BASE_SWAGGER_URL, API_URL)
 
 
 @click.command(name='create-superuser')
+@click.argument('login')
+@click.argument('password')
+@click.argument('last_name')
+@click.argument('first_name')
 def create_superuser(
         login,
         password,
