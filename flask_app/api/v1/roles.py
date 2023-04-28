@@ -30,12 +30,12 @@ def create_role():
 
 @roles.route("/<role_id>", methods=["PATCH"])
 @admin_access()
-def update_role():
-    role_id = request.args.get('user_id')
+def update_role(role_id):
+    # role_id = request.view_args.get('role_id')
     new_role_name = request.json.get('role')
     role_service = RoleService()
-    response, http_status = role_service.update_role(role_id, new_role_name)
-    return jsonify(response), http_status
+    role_service.update_role(role_id, new_role_name)
+    return jsonify({"msg": "Updated role"}), HTTPStatus.CREATED
 
 
 @roles.route("/<role_id>", methods=["DELETE"])

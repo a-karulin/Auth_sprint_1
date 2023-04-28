@@ -93,13 +93,11 @@ class RoleService:
             role_name,
             session: sqlalchemy.orm.Session = None
     ):
-        if session.query(Roles).filter(Roles.id == role_id).first():
-            return {"msg": "Role doesn't exist in database"}, HTTPStatus.NOT_FOUND
-        if session.query(Roles).filter(Roles.role == role_name).first():
-            return {"msg": "Role with this name already exist"}, HTTPStatus.CONFLICT
-        session.query(Roles).filter_by(id=role_id).update({"name": role_name})
+        try:
+            session.query(Roles).filter_by(id=role_id).update({"role": role_name})
+        except NoResultFound:
+            abort(404)
         session.commit()
-        return {"msg": "Updated role"}, HTTPStatus.CREATED
 
     @get_session()
     def delete_role(
