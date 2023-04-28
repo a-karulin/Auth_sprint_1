@@ -10,6 +10,7 @@ from api.v1.users import users
 from config import POSTGRES_CONN_STR, JWT_SECRET_KEY, JWT_ALGORITHM
 from flask_swagger_ui import get_swaggerui_blueprint
 
+from database.db_models import User
 from services.role import RoleService
 from services.user import UserService
 
@@ -28,15 +29,14 @@ API_URL = '/swagger/openapi.yaml'
 swagger_blueprint = get_swaggerui_blueprint(BASE_SWAGGER_URL, API_URL)
 
 
-@click.command()
+@click.command(name='create-superuser')
 def create_superuser(
-        self,
         login,
         password,
         last_name,
         first_name
 ):
-    user = UserService().register_user(password, login, first_name, last_name)
+    user = UserService().create_superuser(password, login, first_name, last_name)
     role_service = RoleService()
     role = role_service.create_role("Admin")
     role_service.apply_user_role(user.id, role.id)
