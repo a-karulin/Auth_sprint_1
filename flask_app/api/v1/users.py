@@ -1,25 +1,43 @@
 from http import HTTPStatus
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt
 
+from services.role import RoleService
+from services.tokens import admin_access
 from services.user import UserService
 
 users = Blueprint("users", __name__)
 
 
+@users.route("/apply-role", methods=["POST"])
+@admin_access()
+@jwt_required()
+def apply_role_to_user():
+    role_service = RoleService()
+    role_service.apply_user_role(
+        user_id=request.json.get('user_id'),
+        role_id=request.json.get('role_id'),
+    )
+
+    return jsonify({'msg': 'role created'}), HTTPStatus.OK
+
+
+@users.route("/delete-role", methods=["DELETE"])
+@admin_access()
+@jwt_required()
+def delete_role_from_user():
+    role_service = RoleService()
+    role_service.delete_user_role(
+        user_id=request.json.get('user_id'),
+        role_id=request.json.get('role_id'),
+    )
+
+    return jsonify({'msg': 'role deleted'}), HTTPStatus.OK
+
+
 @users.route("/{user_id}/roles", methods=["GET"])
-def get_user_roles():
-    pass
-
-
-@users.route("/{user_id}/apply-roles", methods=["POST"])
-def apply_roles():
-    pass
-
-
-@users.route("/{user_id}/delete_role", methods=["DELETE"])
-def delete_user_from_role():
+def get_user_history():
     pass
 
 

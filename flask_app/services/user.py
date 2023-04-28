@@ -36,7 +36,8 @@ class UserService:
             session.add(new_user)
             session.commit()
             new_user = session.query(User).filter(User.login == login).one()
-            return new_user.id
+            new_user = self._transform_query_to_dict(new_user)
+            return new_user
         else:
             abort(400)
 
@@ -65,16 +66,9 @@ class UserService:
                 session.add(user_info)
                 session.commit()
 
-                return user.id
+                user = self._transform_query_to_dict(user)
+                return user
             abort(403)
-
-    @get_session()
-    def get_login_history(self, user_id, session: sqlalchemy.orm.Session = None):
-        query = session.query(History).filter(History.user_id == user_id).all()
-        result = dict()
-        for row in query:
-            result[str(row.auth_date)] = row.user_agent
-        return result
 
     @get_session()
     def change_password(
@@ -116,5 +110,10 @@ class UserService:
                 return user
             abort(401)
 
-    def logout_user(self):
-        pass
+    @staticmethod
+    def _transform_query_to_dict(row) -> dict:
+        query_as_dict = {}
+        for column in row.__table__.columns:
+            if column.name != 'password':
+                query_as_dict[column.name] = getattr(row, column.name)
+        return query_as_dict

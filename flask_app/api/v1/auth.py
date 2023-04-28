@@ -37,11 +37,14 @@ def create_user():
         last_name=request.json.get('last_name'),
         first_name=request.json.get('first_name'),
     )
-    access_token, refresh_token = create_access_and_refresh_tokens(new_user)
+    access_token, refresh_token = create_access_and_refresh_tokens(
+        identity=new_user['id'],
+        payload=new_user,
+    )
     response = {
         'access_token': access_token,
         'refresh_token': refresh_token,
-        'id': new_user,
+        'user': new_user,
     }
     return jsonify(response), HTTPStatus.CREATED
 
@@ -54,11 +57,14 @@ def login_user():
         password=request.json.get('password', None),
         user_agent=request.headers.get("user-agent", ""),
     )
-    access_token, refresh_token = create_access_and_refresh_tokens(user)
+    access_token, refresh_token = create_access_and_refresh_tokens(
+        identity=user['id'],
+        payload=user,
+    )
     response = {
         'access_token': access_token,
         'refresh_token': refresh_token,
-        'id': user,
+        'user': user,
     }
     return jsonify(response), HTTPStatus.OK
 
