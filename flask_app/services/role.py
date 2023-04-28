@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 import sqlalchemy.orm
 from flask import abort
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound, DataError
 
 from database.db import engine
 from database.db_models import Roles, UsersRoles
@@ -95,7 +95,7 @@ class RoleService:
     ):
         try:
             session.query(Roles).filter_by(id=role_id).update({"role": role_name})
-        except NoResultFound:
+        except DataError:
             abort(404)
         session.commit()
 
