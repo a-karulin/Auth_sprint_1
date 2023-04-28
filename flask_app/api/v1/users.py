@@ -1,24 +1,13 @@
 from http import HTTPStatus
 
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
+from flask_jwt_extended import jwt_required, get_jwt
 
-from database.db_models import Roles
 from services.role import RoleService
 from services.tokens import admin_access
 from services.user import UserService
 
 users = Blueprint("users", __name__)
-
-
-@users.route("/roles", methods=["GET"])
-@jwt_required()
-def get_user_roles():
-    identity = get_jwt_identity()
-    user_service = UserService()
-    user = user_service.get_user(identity)
-    roles = user_service.get_roles_of_user(user)
-    return jsonify({'roles': roles}), HTTPStatus.OK
 
 
 @users.route("/apply-role", methods=["POST"])

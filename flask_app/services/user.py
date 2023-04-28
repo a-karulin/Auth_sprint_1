@@ -72,30 +72,6 @@ class UserService:
             abort(403)
 
     @get_session()
-    def get_user(
-            self,
-            user_id: str,
-            session: sqlalchemy.orm.Session = None,
-    ):
-        try:
-            user = session.query(User).filter(User.id == user_id).one()
-            return user
-        except NoResultFound:
-            abort(404)
-
-    @get_session()
-    def get_roles_of_user(self, user: User, session: sqlalchemy.orm.Session = None):
-        roles = session.query(UsersRoles).filter(UsersRoles.user_id == user.id).all()
-        return [self._transform_query_to_dict(role) for role in roles]
-
-    def get_login_history(self, user_id, session: sqlalchemy.orm.Session = None):
-        query = session.query(History).filter(History.user_id == user_id).all()
-        result = dict()
-        for row in query:
-            result[str(row.auth_date)] = row.user_agent
-        return result
-
-    @get_session()
     def change_password(
             self,
             user_id,
