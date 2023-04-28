@@ -6,9 +6,8 @@ from sqlalchemy.exc import NoResultFound
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from database.db import engine
-from database.db_models import User, History, Roles, UsersRoles
+from database.db_models import User, History
 from database.session_decorator import get_session
-from typing import Union
 
 
 class UserService:
