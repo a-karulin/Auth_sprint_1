@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt
 
 from services.role import RoleService
-from services.tokens import admin_access
+from services.tokens import admin_access, validate_access_token
 from services.user import UserService
 
 users = Blueprint("users", __name__)
@@ -13,6 +13,7 @@ users = Blueprint("users", __name__)
 @users.route("/apply-role", methods=["POST"])
 @admin_access()
 @jwt_required()
+@validate_access_token()
 def apply_role_to_user():
     role_service = RoleService()
     role_service.apply_user_role(
@@ -26,6 +27,7 @@ def apply_role_to_user():
 @users.route("/delete-role", methods=["DELETE"])
 @admin_access()
 @jwt_required()
+@validate_access_token()
 def delete_role_from_user():
     role_service = RoleService()
     role_service.delete_user_role(
@@ -43,9 +45,10 @@ def get_user_history():
 
 @users.route("/login-history", methods=["GET"])
 @jwt_required()
+@validate_access_token()
 def get_login_history():
     token = get_jwt()
-    user_id = token.get('sub')  # TODO: add payload
+    user_id = token.get('sub')
     user_service = UserService()
     return jsonify(
         {'history': [user_service.get_login_history(user_id)]}
@@ -54,6 +57,7 @@ def get_login_history():
 
 @users.route("/change-password", methods=["POST"])
 @jwt_required()
+@validate_access_token()
 def change_password():
     token = get_jwt()
     user_service = UserService()
@@ -67,6 +71,7 @@ def change_password():
 
 @users.route("/change-login", methods=["POST"])
 @jwt_required()
+@validate_access_token()
 def change_login():
     token = get_jwt()
     user_service = UserService()
