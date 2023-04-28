@@ -117,3 +117,5 @@ class UserService:
             if column.name != 'password':
                 query_as_dict[column.name] = getattr(row, column.name)
         return query_as_dict
+
+

@@ -80,8 +80,10 @@ class RoleService:
     ):
         if session.query(Roles).filter(Roles.role == role_name).first():
             abort(409)
-        session.add(Roles(role=role_name))
+        role = Roles(role=role_name)
+        session.add(role)
         session.commit()
+        return role
 
     @get_session()
     def update_role(
