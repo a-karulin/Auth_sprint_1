@@ -27,11 +27,6 @@ BASE_SWAGGER_URL = '/apidocs/'
 API_URL = '/swagger/openapi.yaml'
 swagger_blueprint = get_swaggerui_blueprint(BASE_SWAGGER_URL, API_URL)
 
-app.register_blueprint(auth, url_prefix="/api/v1/auth")
-app.register_blueprint(roles, url_prefix="/api/v1/roles")
-app.register_blueprint(users, url_prefix="/api/v1/users")
-app.register_blueprint(swagger_blueprint)
-
 
 @click.command()
 def create_superuser(
@@ -45,6 +40,13 @@ def create_superuser(
     role_service = RoleService()
     role = role_service.create_role("Admin")
     role_service.apply_user_role(user.id, role.id)
+
+
+app.register_blueprint(auth, url_prefix="/api/v1/auth")
+app.register_blueprint(roles, url_prefix="/api/v1/roles")
+app.register_blueprint(users, url_prefix="/api/v1/users")
+app.register_blueprint(swagger_blueprint)
+app.cli.add_command(create_superuser)
 
 
 @app.route('/')
