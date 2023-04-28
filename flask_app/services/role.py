@@ -1,6 +1,6 @@
 import sqlalchemy.orm
 from flask import abort
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound, DataError
 
 from database.db import engine
 from database.db_models import Roles, UsersRoles
@@ -12,11 +12,24 @@ class RoleService:
         self.engine = engine
 
     @get_session()
+    def get_all_roles(self, session: sqlalchemy.orm.Session = None):
+        try:
+            roles = session.query(Roles).all()
+        except NoResultFound:
+            abort(404)
+        else:
+            if roles:
+                roles = [
+                    self._transform_query_to_dict(role) for role in roles
+                ]
+            return roles
+
+    @get_session()
     def apply_user_role(
             self,
             user_id: str,
             role_id: str,
-            session: sqlalchemy.orm.Session = None
+            session: sqlalchemy.orm.Session = None,
     ):
         try:
             session.query(UsersRoles).filter(
@@ -58,3 +71,43 @@ class RoleService:
             return role
         except NoResultFound:
             abort(404)
+
+    @get_session()
+    def create_role(
+            self,
+            role_name,
+            session: sqlalchemy.orm.Session = None
+    ):
+        if session.query(Roles).filter(Roles.role == role_name).first():
+            abort(409)
+        session.add(Roles(role=role_name))
+        session.commit()
+
+    @get_session()
+    def update_role(
+            self,
+            role_id,
+            role_name,
+            session: sqlalchemy.orm.Session = None
+    ):
+        try:
+            session.query(Roles).filter_by(id=role_id).update({"role": role_name})
+        except DataError:
+            abort(404)
+        session.commit()
+
+    @get_session()
+    def delete_role(
+            self,
+            role_id,
+            session: sqlalchemy.orm.Session = None
+    ):
+        session.query(Roles).filter_by(id=role_id).delete()
+        session.commit()
+
+    @staticmethod
+    def _transform_query_to_dict(row) -> dict:
+        query_as_dict = {}
+        for column in row.__table__.columns:
+            query_as_dict[column.name] = getattr(row, column.name)
+        return query_as_dict

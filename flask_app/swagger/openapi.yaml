@@ -156,6 +156,90 @@ paths:
       security:
         - AccessToken: [ ]
 
+  /api/v1/roles/create:
+    post:
+      summary: Создание роли
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role_name:
+                  type: string
+      responses:
+        '200':
+          description: 'Роль создана'
+        '403':
+          description: 'Нет прав'
+      security:
+        - jwtAuthAccess: [ ]
+
+  /api/v1/roles:
+    get:
+      summary: Получить всех список ролей
+      responses:
+        '200':
+          description: 'Список ролей получен'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+        '403':
+          description: 'Нет прав'
+      security:
+        - jwtAuthAccess: [ ]
+
+  /api/v1/roles/{role_id}:
+    patch:
+      summary: Редактирование роли
+      parameters:
+        - name: user_id
+          in: query
+          description: 'ид пользователя'
+          required: true
+          schema:
+            type: int
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+      responses:
+        '200':
+          description: 'Роль отредактирована'
+        '404':
+          description: 'Роль не найдена'
+        '403':
+          description: 'Роль с таким названием уже есть'
+      security:
+        - jwtAuthAccess: [ ]
+
+    delete:
+      summary: удалить роль
+      responses:
+        '200':
+          description: 'Роль удалена'
+        '400':
+          description: 'Роль не найдена'
+        '403':
+          description: 'Роль с таким названием уже есть'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+      security:
+        - jwtAuthAccess: [ ]
+
 
 components:
   securitySchemes:
