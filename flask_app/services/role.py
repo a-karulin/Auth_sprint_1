@@ -14,11 +14,25 @@ class RoleService:
         self.engine = engine
 
     @get_session()
+    def get_all_roles(self, session: sqlalchemy.orm.Session = None):
+        try:
+            roles = session.query(Roles).all()
+        except NoResultFound:
+            abort(404)
+        else:
+            if roles:
+                roles = [
+                    self._transform_query_to_dict(role) for role in roles
+                ]
+            return roles
+
+
+    @get_session()
     def apply_user_role(
             self,
             user_id: str,
             role_id: str,
-            session: sqlalchemy.orm.Session = None
+            session: sqlalchemy.orm.Session = None,
     ):
         try:
             session.query(UsersRoles).filter(
@@ -99,3 +113,10 @@ class RoleService:
         session.query(Roles).filter_by(id=role_id).delete()
         session.commit()
         return {"msg": "Deleted role"}, HTTPStatus.OK
+
+    @staticmethod
+    def _transform_query_to_dict(row) -> dict:
+        query_as_dict = {}
+        for column in row.__table__.columns:
+            query_as_dict[column.name] = getattr(row, column.name)
+        return query_as_dict

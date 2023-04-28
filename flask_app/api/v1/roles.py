@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 
@@ -12,7 +14,9 @@ roles = Blueprint("roles", __name__)
 @jwt_required()
 @admin_access()
 def roles_list():
-    return [Roles(id=role_item.id, role=role_item.role) for role_item in Roles.query.all()]
+    role_service = RoleService()
+    roles = role_service.get_all_roles()
+    return roles, HTTPStatus.OK
 
 
 @roles.route("/create", methods=["POST"])
