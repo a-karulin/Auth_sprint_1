@@ -31,7 +31,6 @@ def create_role():
 @roles.route("/<role_id>", methods=["PATCH"])
 @admin_access()
 def update_role(role_id):
-    # role_id = request.view_args.get('role_id')
     new_role_name = request.json.get('role')
     role_service = RoleService()
     role_service.update_role(role_id, new_role_name)
@@ -40,8 +39,7 @@ def update_role(role_id):
 
 @roles.route("/<role_id>", methods=["DELETE"])
 @admin_access()
-def delete_role():
-    role_id = request.args.get('user_id')
+def delete_role(role_id):
     role_service = RoleService()
-    response, http_status = role_service.delete_role(role_id)
-    return jsonify(response), http_status
+    role_service.delete_role(role_id)
+    return jsonify({"msg": "Deleted role"}), HTTPStatus.OK

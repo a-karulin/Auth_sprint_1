@@ -105,11 +105,8 @@ class RoleService:
             role_id,
             session: sqlalchemy.orm.Session = None
     ):
-        if not session.query(Roles).filter(Roles.id == role_id).first():
-            return {"msg": "Role not found"}, HTTPStatus.NOT_FOUND
         session.query(Roles).filter_by(id=role_id).delete()
         session.commit()
-        return {"msg": "Deleted role"}, HTTPStatus.OK
 
     @staticmethod
     def _transform_query_to_dict(row) -> dict:
