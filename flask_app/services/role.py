@@ -1,5 +1,3 @@
-from http import HTTPStatus
-
 import sqlalchemy.orm
 from flask import abort
 from sqlalchemy.exc import NoResultFound, DataError
@@ -25,7 +23,6 @@ class RoleService:
                     self._transform_query_to_dict(role) for role in roles
                 ]
             return roles
-
 
     @get_session()
     def apply_user_role(
