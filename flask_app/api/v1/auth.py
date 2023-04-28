@@ -81,7 +81,6 @@ def logout():
 
 @auth.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)
-@validate_access_token()
 def refresh_tokens():
     token = get_jwt()
     user_id = token.get('sub')
