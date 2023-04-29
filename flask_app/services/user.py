@@ -118,6 +118,15 @@ class UserService:
             result[str(row.auth_date)] = row.user_agent
         return result
 
+    @get_session()
+    def get_user_by_id(self, user_id: str, session: sqlalchemy.orm.Session = None):
+        try:
+            user = session.query(User).filter(User.id == user_id).one()
+        except NoResultFound:
+            abort(404)
+        else:
+            return self._transform_query_to_dict(user)
+
     @staticmethod
     def _transform_query_to_dict(row) -> dict:
         query_as_dict = {}

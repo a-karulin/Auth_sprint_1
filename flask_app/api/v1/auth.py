@@ -83,11 +83,13 @@ def logout():
 @jwt_required(refresh=True)
 def refresh_tokens():
     token = get_jwt()
-    user_id = token.get('sub')
+    user_id = token.get('id')
+    user_service = UserService()
     redis_storage = RedisTokenStorage()
     if redis_storage.check_token_in_blacklist(token) is None:
+        user = user_service.get_user_by_id(user_id)
         redis_storage.add_token_to_blacklist(token)
-        access_token, refresh_token = create_access_and_refresh_tokens(user_id)
+        access_token, refresh_token = create_access_and_refresh_tokens(user_id, user)
         response = {
             'access_token': access_token,
             'refresh_token': refresh_token,
