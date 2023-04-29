@@ -1,8 +1,10 @@
+from typing import List, Dict, Type
+
 import sqlalchemy.orm
 from flask import abort
 from sqlalchemy.exc import NoResultFound, DataError
 
-from database.db import engine
+from database.db import engine, Base
 from database.db_models import Roles, UsersRoles
 from database.session_decorator import get_session
 
@@ -12,7 +14,7 @@ class RoleService:
         self.engine = engine
 
     @get_session()
-    def get_all_roles(self, session: sqlalchemy.orm.Session = None):
+    def get_all_roles(self, session: sqlalchemy.orm.Session = None) -> List[Dict[str, str]]:
         try:
             roles = session.query(Roles).all()
         except NoResultFound:
@@ -30,7 +32,7 @@ class RoleService:
             user_id: str,
             role_id: str,
             session: sqlalchemy.orm.Session = None,
-    ):
+    ) -> None:
         try:
             session.query(UsersRoles).filter(
                 UsersRoles.user_id == user_id,
@@ -49,7 +51,7 @@ class RoleService:
             user_id: str,
             role_id: str,
             session: sqlalchemy.orm.Session = None
-    ):
+    ) -> None:
         try:
             role = session.query(UsersRoles).filter(
                 UsersRoles.user_id == user_id,
@@ -61,23 +63,11 @@ class RoleService:
             abort(404)
 
     @get_session()
-    def get_role(
-            self,
-            role_name,
-            session: sqlalchemy.orm.Session = None
-    ):
-        try:
-            role = session.query(Roles).filter(role=role_name).one()
-            return role
-        except NoResultFound:
-            abort(404)
-
-    @get_session()
     def create_role(
             self,
-            role_name,
+            role_name: str,
             session: sqlalchemy.orm.Session = None
-    ):
+    ) -> None:
         if session.query(Roles).filter(Roles.role == role_name).first():
             abort(409)
         session.add(Roles(role=role_name))
@@ -86,10 +76,10 @@ class RoleService:
     @get_session()
     def update_role(
             self,
-            role_id,
-            role_name,
+            role_id: str,
+            role_name: str,
             session: sqlalchemy.orm.Session = None
-    ):
+    ) -> None:
         try:
             session.query(Roles).filter_by(id=role_id).update({"role": role_name})
         except DataError:
@@ -99,14 +89,14 @@ class RoleService:
     @get_session()
     def delete_role(
             self,
-            role_id,
+            role_id: str,
             session: sqlalchemy.orm.Session = None
-    ):
+    ) -> None:
         session.query(Roles).filter_by(id=role_id).delete()
         session.commit()
 
     @staticmethod
-    def _transform_query_to_dict(row) -> dict:
+    def _transform_query_to_dict(row: Type[Base]) -> Dict[str, str]:
         query_as_dict = {}
         for column in row.__table__.columns:
             query_as_dict[column.name] = getattr(row, column.name)
