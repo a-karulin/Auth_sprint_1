@@ -7,7 +7,7 @@ from sqlalchemy.exc import NoResultFound
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from database.db import engine, Base
-from database.db_models import User, History
+from database.db_models import User, History, Roles, UsersRoles
 from database.session_decorator import get_session
 
 
@@ -136,6 +136,19 @@ class UserService:
             abort(404)
         else:
             return self._transform_query_to_dict(user)
+
+    @get_session()
+    def get_roles_names_for_user(self, user_id: str, session: sqlalchemy.orm.Session = None):
+        roles = session.query(
+            Roles.role,
+        ).join(
+            UsersRoles,
+            Roles.id == UsersRoles.role_id,
+        ).where(
+            UsersRoles.user_id == user_id,
+        ).all()
+        roles = [role.role for role in roles]
+        return roles
 
     @staticmethod
     def _transform_query_to_dict(row: Type[Base]) -> Dict[str, str]:

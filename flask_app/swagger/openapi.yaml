@@ -77,24 +77,24 @@ paths:
         - AccessToken: [ ]
         - RefreshToken: [ ]
 
-  /api/v1/users/get_user_roles:
-    post:
-      summary: 'Получение ролей пользователя'
+  /api/v1/users/login-history:
+    get:
+      summary: 'Получение истории логинов пользователя'
       responses:
         '200':
-          description: 'Список ролей получен'
+          description: 'Список истории получен'
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Role'
+                  $ref: '#/components/schemas/History'
         '403':
-          description: 'Нет прав на получение списка ролей'
+          description: 'Нет прав на получение истории'
       security:
         - AccessToken: [ ]
 
-  /api/v1/users/{user_id}/apply_roles:
+  /api/v1/users/{user_id}/apply-roles:
     post:
       summary: 'Применение роли пользователю'
       tags:
@@ -125,7 +125,7 @@ paths:
       security:
         - AccessToken: [ ]
 
-  /api/v1/users/{user_id}/delete_role:
+  /api/v1/users/{user_id}/delete-role:
     post:
       summary: 'Удаление роли у пользователя'
       tags:
@@ -282,4 +282,21 @@ components:
         - role
       properties:
         role:
+          type: string
+
+    History:
+      type: object
+      required:
+        - id
+        - user_id
+        - user_agent
+        - auth_date
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        user_agent:
+          type: string
+        auth_date:
           type: string

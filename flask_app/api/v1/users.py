@@ -58,7 +58,7 @@ def delete_role_from_user():
 @validate_access_token()
 def get_login_history():
     token = get_jwt()
-    user_id = token.get('sub')
+    user_id = token.get('id')
     user_service = UserService()
     return jsonify(
         {'history': [user_service.get_login_history(user_id)]}
