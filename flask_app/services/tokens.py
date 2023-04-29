@@ -1,6 +1,7 @@
 from datetime import timedelta
 from functools import wraps
 from http import HTTPStatus
+from typing import Dict, List, Tuple, Any
 
 import redis
 from flask import jsonify, abort
@@ -27,11 +28,11 @@ def admin_access():
 
 
 def create_access_and_refresh_tokens(
-        identity,
-        payload,
-        seconds=900,
-        days=30
-):
+        identity: str,
+        payload: Dict[str, str],
+        seconds: int = 900,
+        days: int = 30,
+) -> Tuple[str, str]:
     exp_access = timedelta(seconds=seconds)
     exp_refresh = timedelta(days=days)
     access_token = create_access_token(
@@ -50,14 +51,14 @@ class RedisTokenStorage:
             host=self.redis_host, port=self.redis_port, db=0, decode_responses=True
         )
 
-    def add_token_to_blacklist(self, token):
+    def add_token_to_blacklist(self, token: Dict[str, Any]) -> None:
         jti = token["jti"]
         iat = token.get('iat')
         exp = token.get('exp')
         seconds_till_expire = exp - iat
         self.jwt_redis_blocklist.set(jti, "expired", ex=timedelta(seconds=seconds_till_expire))
 
-    def check_token_in_blacklist(self, token):
+    def check_token_in_blacklist(self, token: Dict[str, Any]) -> str | None:
         jti = token["jti"]
         return self.jwt_redis_blocklist.get(jti)
 
