@@ -68,7 +68,7 @@ class UserService:
 
                 user = self._transform_query_to_dict(user)
                 return user
-            abort(403)
+            abort(401)
 
     @get_session()
     def change_password(

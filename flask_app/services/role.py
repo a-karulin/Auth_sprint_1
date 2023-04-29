@@ -58,7 +58,7 @@ class RoleService:
             session.delete(role)
             session.commit()
         except NoResultFound:
-            abort(409)
+            abort(404)
 
     @get_session()
     def get_role(
