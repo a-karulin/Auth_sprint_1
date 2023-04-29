@@ -172,5 +172,3 @@ class UserService:
             return new_user
         else:
             abort(400)
-
-

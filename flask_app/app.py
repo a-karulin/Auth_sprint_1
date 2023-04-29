@@ -10,8 +10,6 @@ from api.v1.users import users
 from config import POSTGRES_CONN_STR, JWT_SECRET_KEY, JWT_ALGORITHM
 from flask_swagger_ui import get_swaggerui_blueprint
 
-from database.db_models import User
-from services.role import RoleService
 from services.user import UserService
 
 app = Flask(__name__)
