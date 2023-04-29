@@ -1,7 +1,7 @@
 from datetime import timedelta
 from functools import wraps
 from http import HTTPStatus
-from typing import Dict, List, Tuple, Any
+from typing import Dict, Tuple, Any
 
 import redis
 from flask import jsonify, abort
