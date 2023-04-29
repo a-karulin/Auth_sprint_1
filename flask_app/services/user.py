@@ -144,3 +144,31 @@ class UserService:
             if column.name != 'password':
                 query_as_dict[column.name] = getattr(row, column.name)
         return query_as_dict
+
+    @get_session()
+    def create_superuser(
+            self,
+            password: str,
+            login: str,
+            first_name: str,
+            last_name: str,
+            session: sqlalchemy.orm.Session = None
+    ):
+        try:
+            session.query(User).filter(User.login == login).one()
+        except NoResultFound:
+            password_hash = generate_password_hash(password)
+            admin = User(
+                login=login,
+                password=password_hash,
+                first_name=first_name,
+                last_name=last_name,
+                is_admin=True
+            )
+            session.add(admin)
+            session.commit()
+            new_user = session.query(User).filter(User.login == login).one()
+            new_user = self._transform_query_to_dict(new_user)
+            return new_user
+        else:
+            abort(400)
