@@ -1,9 +1,10 @@
 from datetime import timedelta
 from functools import wraps
 from http import HTTPStatus
+from typing import Dict, Tuple, Any
 
 import redis
-from flask import jsonify
+from flask import jsonify, abort
 from flask_jwt_extended import create_access_token, verify_jwt_in_request, get_jwt
 from flask_jwt_extended import create_refresh_token
 
@@ -27,11 +28,11 @@ def admin_access():
 
 
 def create_access_and_refresh_tokens(
-        identity,
-        payload,
-        seconds=900,
-        days=30
-):
+        identity: str,
+        payload: Dict[str, str],
+        seconds: int = 900,
+        days: int = 30,
+) -> Tuple[str, str]:
     exp_access = timedelta(seconds=seconds)
     exp_refresh = timedelta(days=days)
     access_token = create_access_token(
@@ -50,13 +51,35 @@ class RedisTokenStorage:
             host=self.redis_host, port=self.redis_port, db=0, decode_responses=True
         )
 
-    def add_refresh_token_to_blacklist(self, token):
+    def add_token_to_blacklist(self, token: Dict[str, Any]) -> None:
         jti = token["jti"]
         iat = token.get('iat')
         exp = token.get('exp')
         seconds_till_expire = exp - iat
-        self.jwt_redis_blocklist.set(jti, "", ex=timedelta(seconds=seconds_till_expire))
+        self.jwt_redis_blocklist.set(jti, "expired", ex=timedelta(seconds=seconds_till_expire))
 
-    def check_token_in_blacklist(self, token):
+    def check_token_in_blacklist(self, token: Dict[str, Any]) -> str | None:
         jti = token["jti"]
         return self.jwt_redis_blocklist.get(jti)
+
+
+def get_redis_storage():
+    return RedisTokenStorage()
+
+
+def validate_access_token(
+        token_store_service: RedisTokenStorage = get_redis_storage(),
+):
+    def wrapper(fn):
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            token = get_jwt()
+            token_in_blacklist = token_store_service.check_token_in_blacklist(token)
+            if token_in_blacklist:
+                abort(401)
+            else:
+                return fn(*args, **kwargs)
+
+        return decorator
+
+    return wrapper
