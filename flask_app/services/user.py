@@ -1,11 +1,12 @@
 from datetime import datetime
+from typing import Dict, Type
 
 import sqlalchemy.orm
 from flask import abort
 from sqlalchemy.exc import NoResultFound
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from database.db import engine
+from database.db import engine, Base
 from database.db_models import User, History
 from database.session_decorator import get_session
 
@@ -22,7 +23,8 @@ class UserService:
             first_name: str,
             last_name: str,
             session: sqlalchemy.orm.Session = None
-    ):
+    ) -> Dict[str, str]:
+        """Зарегистрировать пользователя."""
         try:
             session.query(User).filter(User.login == login).one()
         except NoResultFound:
@@ -48,7 +50,7 @@ class UserService:
             password: str,
             user_agent: str,
             session: sqlalchemy.orm.Session = None
-    ):
+    ) -> Dict[str, str]:
         """Получить пользователя по логину
         :param login: логин (e-mail пользователя)"""
 
@@ -73,11 +75,11 @@ class UserService:
     @get_session()
     def change_password(
             self,
-            user_id,
-            old_password,
-            new_password,
+            user_id: str,
+            old_password: str,
+            new_password: str,
             session: sqlalchemy.orm.Session = None,
-    ):
+    ) -> Dict[str, str]:
         try:
             user = session.query(User).filter(User.id == user_id).one()
         except NoResultFound:
@@ -93,11 +95,11 @@ class UserService:
     @get_session()
     def change_login(
             self,
-            user_id,
-            password,
-            new_login,
+            user_id: str,
+            password: str,
+            new_login: str,
             session: sqlalchemy.orm.Session = None,
-    ):
+    ) -> Dict[str, str]:
         try:
             user = session.query(User).filter(User.id == user_id).one()
         except NoResultFound:
@@ -111,7 +113,11 @@ class UserService:
             abort(401)
 
     @get_session()
-    def get_login_history(self, user_id, session: sqlalchemy.orm.Session = None):
+    def get_login_history(
+            self,
+            user_id: str,
+            session: sqlalchemy.orm.Session = None,
+    ) -> Dict[str, str]:
         query = session.query(History).filter(History.user_id == user_id).all()
         result = dict()
         for row in query:
@@ -119,7 +125,11 @@ class UserService:
         return result
 
     @get_session()
-    def get_user_by_id(self, user_id: str, session: sqlalchemy.orm.Session = None):
+    def get_user_by_id(
+            self,
+            user_id: str,
+            session: sqlalchemy.orm.Session = None,
+    ) -> Dict[str, str]:
         try:
             user = session.query(User).filter(User.id == user_id).one()
         except NoResultFound:
@@ -128,7 +138,7 @@ class UserService:
             return self._transform_query_to_dict(user)
 
     @staticmethod
-    def _transform_query_to_dict(row) -> dict:
+    def _transform_query_to_dict(row: Type[Base]) -> Dict[str, str]:
         query_as_dict = {}
         for column in row.__table__.columns:
             if column.name != 'password':
