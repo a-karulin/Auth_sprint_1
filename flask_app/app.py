@@ -40,10 +40,7 @@ def create_superuser(
         last_name,
         first_name
 ):
-    user = UserService().create_superuser(password, login, first_name, last_name)
-    role_service = RoleService()
-    role = role_service.create_role("Admin")
-    role_service.apply_user_role(user.id, role.id)
+    UserService().create_superuser(password, login, first_name, last_name)
 
 
 app.register_blueprint(auth, url_prefix="/api/v1/auth")
