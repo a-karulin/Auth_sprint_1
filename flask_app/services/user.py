@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Dict, Type
-
+import logging
 import sqlalchemy.orm
 from flask import abort
 from sqlalchemy.exc import NoResultFound
@@ -9,6 +9,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from database.db import engine, Base
 from database.db_models import User, History, Roles, UsersRoles
 from database.session_decorator import get_session
+
+
+logger = logging.getLogger(__name__)
 
 
 class UserService:
@@ -25,8 +28,10 @@ class UserService:
             session: sqlalchemy.orm.Session = None
     ) -> Dict[str, str]:
         """Зарегистрировать пользователя."""
+        logger.debug("Регистрация пользователя")
         try:
             session.query(User).filter(User.login == login).one()
+            logger.info(f"Пользователь {login} уже существует")
         except NoResultFound:
             password_hash = generate_password_hash(password)
             new_user = User(
@@ -37,6 +42,7 @@ class UserService:
             )
             session.add(new_user)
             session.commit()
+            logger.info(f"Создан пользователь {login}")
             new_user = session.query(User).filter(User.login == login).one()
             new_user = self._transform_query_to_dict(new_user)
             return new_user
@@ -53,9 +59,10 @@ class UserService:
     ) -> Dict[str, str]:
         """Получить пользователя по логину
         :param login: логин (e-mail пользователя)"""
-
+        logger.debug(f"Вход пользователя {login} в учетную запись")
         try:
             user = session.query(User).filter(User.login == login).one()
+            logger.info(f"Пользователь {login} найден")
         except NoResultFound:
             abort(404)
         else:
@@ -67,7 +74,7 @@ class UserService:
                 )
                 session.add(user_info)
                 session.commit()
-
+                logger.info(f"В историю внесена информация о входе пользователя {login}")
                 user = self._transform_query_to_dict(user)
                 return user
             abort(401)
@@ -80,14 +87,17 @@ class UserService:
             new_password: str,
             session: sqlalchemy.orm.Session = None,
     ) -> Dict[str, str]:
+        logger.debug(f"Меняем пароль для пользователя с ид {user_id}")
         try:
             user = session.query(User).filter(User.id == user_id).one()
+            logger.info("Пользователь найден в бд")
         except NoResultFound:
             abort(404)
         else:
             if user and check_password_hash(user.password, old_password):
                 user.password = generate_password_hash(new_password)
                 session.commit()
+                logger.info("Пароль пользователя изменен")
                 user = session.query(User).filter(User.id == user_id).one()
                 return user
             abort(401)
@@ -100,14 +110,17 @@ class UserService:
             new_login: str,
             session: sqlalchemy.orm.Session = None,
     ) -> Dict[str, str]:
+        logger.debug(f"Меняем e-mail для пользователя с ид {user_id}")
         try:
             user = session.query(User).filter(User.id == user_id).one()
+            logger.info("Пользователь найден в бд")
         except NoResultFound:
             abort(404)
         else:
             if user and check_password_hash(user.password, password):
                 user.login = new_login
                 session.commit()
+                logger.info("Логин пользователя изменен")
                 user = session.query(User).filter(User.id == user_id).one()
                 return user
             abort(401)
@@ -118,6 +131,7 @@ class UserService:
             user_id: str,
             session: sqlalchemy.orm.Session = None,
     ) -> Dict[str, str]:
+        logger.debug(f"Получаем историю по пользователю с ид {user_id}")
         query = session.query(History).filter(History.user_id == user_id).all()
         result = dict()
         for row in query:
@@ -130,6 +144,7 @@ class UserService:
             user_id: str,
             session: sqlalchemy.orm.Session = None,
     ) -> Dict[str, str]:
+        logger.debug(f"Получаем полную информацию по пользователю по ид {user_id}")
         try:
             user = session.query(User).filter(User.id == user_id).one()
         except NoResultFound:
@@ -139,6 +154,7 @@ class UserService:
 
     @get_session()
     def get_roles_names_for_user(self, user_id: str, session: sqlalchemy.orm.Session = None):
+        logger.debug("Получаем роли по пользователю")
         roles = session.query(
             Roles.role,
         ).join(
@@ -167,8 +183,10 @@ class UserService:
             last_name: str,
             session: sqlalchemy.orm.Session = None
     ):
+        logger.debug("Создаем админа")
         try:
             session.query(User).filter(User.login == login).one()
+            logger.debug("Админ уже существует")
         except NoResultFound:
             password_hash = generate_password_hash(password)
             admin = User(
@@ -180,6 +198,7 @@ class UserService:
             )
             session.add(admin)
             session.commit()
+            logger.debug("Админ создан")
             new_user = session.query(User).filter(User.login == login).one()
             new_user = self._transform_query_to_dict(new_user)
             return new_user
