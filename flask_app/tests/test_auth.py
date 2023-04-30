@@ -1,17 +1,26 @@
-from random import randint
-
 import requests
 
-from tests.conftest import HOST
+from tests.conftest import HOST, TEST_LOGIN, TEST_PASSWORD, TEST_LAST_NAME, TEST_FIRST_NAME
 
 
 def test_sign_up(delete_user_after_test):
     headers = {"Content-Type": "application/json; charset=utf-8"}
     url = f'{HOST}/api/v1/auth/signup'
-    data = {'login': 'test_login', 'password': str(randint(0, 10000)),
-            'first_name': 'test_first_name', 'last_name': 'test_last_name'}
+    data = {'login': TEST_LOGIN, 'password': TEST_PASSWORD,
+            'first_name': TEST_FIRST_NAME, 'last_name': TEST_LAST_NAME}
     response = requests.post(url=url,
                              json=data,
                              headers=headers
                              )
     assert response.status_code == 201
+
+
+def test_login(create_and_delete_user):
+    headers = {"Content-Type": "application/json; charset=utf-8"}
+    url = f'{HOST}/api/v1/auth/login'
+    data = {'login': TEST_LOGIN, 'password': TEST_PASSWORD}
+    response = requests.post(url=url,
+                             json=data,
+                             headers=headers
+                             )
+    assert response.status_code == 200
