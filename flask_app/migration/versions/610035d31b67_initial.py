@@ -39,7 +39,7 @@ def upgrade() -> None:
         sa.Column('auth_date', sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'],
-                                name='history_fkey'),
+                                name='history_fkey', ondelete="CASCADE"),
     )
 
     op.create_table(
