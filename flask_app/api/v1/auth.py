@@ -4,7 +4,7 @@ from http import HTTPStatus
 from flask import Blueprint, request, jsonify, make_response
 
 from services.tokens import create_access_and_refresh_tokens, RedisTokenStorage, validate_access_token
-from services.user import UserService
+from services.user import user_service
 
 auth = Blueprint("auth", __name__)
 
@@ -26,7 +26,6 @@ def handle_invalid_creds_request(error):
 
 @auth.route("/signup", methods=["POST"])
 def create_user():
-    user_service = UserService()
     new_user = user_service.register_user(
         login=request.json.get('login'),
         password=request.json.get('password'),
@@ -48,7 +47,6 @@ def create_user():
 
 @auth.route("/login", methods=["POST"])
 def login_user():
-    user_service = UserService()
     user = user_service.login_user(
         login=request.json.get('login'),
         password=request.json.get('password', None),
@@ -82,7 +80,6 @@ def logout():
 def refresh_tokens():
     token = get_jwt()
     user_id = token.get('id')
-    user_service = UserService()
     redis_storage = RedisTokenStorage()
     if redis_storage.check_token_in_blacklist(token) is None:
         user = user_service.get_user_by_id(user_id)

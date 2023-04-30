@@ -118,3 +118,6 @@ class RoleService:
         for column in row.__table__.columns:
             query_as_dict[column.name] = getattr(row, column.name)
         return query_as_dict
+
+
+role_service = RoleService()

@@ -3,9 +3,9 @@ from http import HTTPStatus
 from flask import Blueprint, request, jsonify, make_response
 from flask_jwt_extended import jwt_required, get_jwt
 
-from services.role import RoleService
+from services.role import role_service
 from services.tokens import admin_access, validate_access_token
-from services.user import UserService
+from services.user import user_service
 
 users = Blueprint("users", __name__)
 
@@ -30,7 +30,6 @@ def handle_invalid_creds_request(error):
 @jwt_required()
 @validate_access_token()
 def apply_role_to_user():
-    role_service = RoleService()
     role_service.apply_user_role(
         user_id=request.json.get('user_id'),
         role_id=request.json.get('role_id'),
@@ -44,7 +43,6 @@ def apply_role_to_user():
 @jwt_required()
 @validate_access_token()
 def delete_role_from_user():
-    role_service = RoleService()
     role_service.delete_user_role(
         user_id=request.json.get('user_id'),
         role_id=request.json.get('role_id'),
@@ -59,7 +57,6 @@ def delete_role_from_user():
 def get_login_history():
     token = get_jwt()
     user_id = token.get('id')
-    user_service = UserService()
     return jsonify(
         {'history': [user_service.get_login_history(user_id)]}
     ), HTTPStatus.OK
@@ -70,7 +67,6 @@ def get_login_history():
 @validate_access_token()
 def change_password():
     token = get_jwt()
-    user_service = UserService()
     user_service.change_password(
         user_id=token.get('id'),
         old_password=request.json.get('old_password'),
@@ -84,7 +80,6 @@ def change_password():
 @validate_access_token()
 def change_login():
     token = get_jwt()
-    user_service = UserService()
     user_service.change_login(
         user_id=token.get('id'),
         new_login=request.json.get('new_login'),

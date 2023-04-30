@@ -204,3 +204,6 @@ class UserService:
             return new_user
         else:
             abort(400)
+
+
+user_service = UserService()
