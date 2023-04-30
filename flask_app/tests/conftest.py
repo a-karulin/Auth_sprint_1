@@ -1,4 +1,5 @@
 import pytest
+import requests
 from sqlalchemy.orm import Session
 from werkzeug.security import generate_password_hash
 
@@ -31,6 +32,30 @@ def create_and_delete_user():
         )
         session.add(new_user)
         session.commit()
-        yield
+        yield session
         session.query(User).filter_by(login=TEST_LOGIN).delete()
         session.commit()
+
+
+@pytest.fixture()
+def get_tokens():
+    with Session(engine) as session:
+        new_user = User(
+            login=TEST_LOGIN,
+            password=generate_password_hash(TEST_PASSWORD),
+            first_name=TEST_FIRST_NAME,
+            last_name=TEST_LAST_NAME,
+        )
+        session.add(new_user)
+        session.commit()
+        headers = {"Content-Type": "application/json; charset=utf-8"}
+        login_url = f'{HOST}/api/v1/auth/login'
+        data = {'login': TEST_LOGIN, 'password': TEST_PASSWORD}
+        login = requests.post(url=login_url,
+                              json=data,
+                              headers=headers
+                              )
+        yield login.json()
+        session.query(User).filter_by(login=TEST_LOGIN).delete()
+        session.commit()
+

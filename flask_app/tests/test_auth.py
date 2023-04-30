@@ -24,3 +24,16 @@ def test_login(create_and_delete_user):
                              headers=headers
                              )
     assert response.status_code == 200
+
+
+def test_logout(get_tokens):
+    headers = {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Authorization': f'Bearer {get_tokens["access_token"]}',
+    }
+    url = f'{HOST}/api/v1/auth/logout'
+    response = requests.delete(
+        url=url,
+        headers=headers
+    )
+    assert response.status_code == 200
