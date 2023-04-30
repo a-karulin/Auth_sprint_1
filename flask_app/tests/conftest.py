@@ -58,4 +58,3 @@ def get_tokens():
         yield login.json()
         session.query(User).filter_by(login=TEST_LOGIN).delete()
         session.commit()
-
