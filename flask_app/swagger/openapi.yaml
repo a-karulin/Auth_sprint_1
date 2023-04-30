@@ -80,6 +80,13 @@ paths:
   /api/v1/users/login-history:
     get:
       summary: 'Получение истории логинов пользователя'
+      parameters:
+        - name: page_size
+          in: query
+          description: 'размер страницы'
+          required: false
+          schema:
+            type: int
       responses:
         '200':
           description: 'Список истории получен'

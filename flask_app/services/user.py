@@ -129,6 +129,7 @@ class UserService:
     def get_login_history(
             self,
             user_id: str,
+            page_size: int,
             session: sqlalchemy.orm.Session = None,
     ) -> Dict[str, str]:
         logger.debug(f"Получаем историю по пользователю с ид {user_id}")

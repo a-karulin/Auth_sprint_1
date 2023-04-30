@@ -55,10 +55,11 @@ def delete_role_from_user():
 @jwt_required()
 @validate_access_token()
 def get_login_history():
+    page_size = request.args.get("page_size", default=10, type=int)
     token = get_jwt()
     user_id = token.get('id')
     return jsonify(
-        {'history': [user_service.get_login_history(user_id)]}
+        {'history': [user_service.get_login_history(user_id, page_size)]}
     ), HTTPStatus.OK
 
 
