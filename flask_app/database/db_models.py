@@ -28,14 +28,14 @@ class UsersRoles(Base):
     __tablename__ = 'users_roles'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    user_id = Column(UUID(as_uuid=True), ForeignKey(User.id))
-    role_id = Column(UUID(as_uuid=True), ForeignKey(Roles.id))
+    user_id = Column(UUID(as_uuid=True), nullable=False)
+    role_id = Column(UUID(as_uuid=True), nullable=False)
 
 
 class History(Base):
     __tablename__ = 'history'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    user_id = Column(UUID(as_uuid=True), ForeignKey(User.id))
+    user_id = Column(UUID(as_uuid=True), ForeignKey(User.id, ondelete='CASCADE'))
     user_agent = Column(String, nullable=False)
     auth_date = Column(DateTime, nullable=False)
