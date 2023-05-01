@@ -12,6 +12,7 @@ TEST_PASSWORD = 'test_password'
 TEST_FIRST_NAME = 'test_first_name'
 TEST_LAST_NAME = 'test_last_name'
 TEST_ROLE_NAME = 'test_role'
+TEST_ROLE_ID = '81dae9f3-4251-429d-bd27-1f75bde74ae4'
 
 
 @pytest.fixture()
@@ -83,4 +84,18 @@ def get_tokens_for_admin():
         yield login.json()
         session.query(User).filter_by(login=TEST_LOGIN).delete()
         session.query(Roles).filter_by(role=TEST_ROLE_NAME).delete()
+        session.commit()
+
+
+@pytest.fixture()
+def create_role():
+    with Session(engine) as session:
+        new_role = Roles(
+            id=TEST_ROLE_ID,
+            role=TEST_ROLE_NAME,
+        )
+        session.add(new_role)
+        session.commit()
+        yield
+        session.query(Roles).filter_by(id=TEST_ROLE_ID).delete()
         session.commit()
