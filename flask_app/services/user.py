@@ -31,7 +31,7 @@ class UserService:
         logger.debug("Регистрация пользователя")
         try:
             session.query(User).filter(User.login == login).one()
-            logger.info(f"Пользователь {login} уже существует")
+            logger.info("Пользователь %s уже существует", login)
         except NoResultFound:
             password_hash = generate_password_hash(password)
             new_user = User(
@@ -42,7 +42,7 @@ class UserService:
             )
             session.add(new_user)
             session.commit()
-            logger.info(f"Создан пользователь {login}")
+            logger.info(f"Создан пользователь %s", login)
             new_user = session.query(User).filter(User.login == login).one()
             new_user = self._transform_query_to_dict(new_user)
             return new_user
@@ -59,10 +59,10 @@ class UserService:
     ) -> Dict[str, str]:
         """Получить пользователя по логину
         :param login: логин (e-mail пользователя)"""
-        logger.debug(f"Вход пользователя {login} в учетную запись")
+        logger.debug("Вход пользователя %s в учетную запись", login)
         try:
             user = session.query(User).filter(User.login == login).one()
-            logger.info(f"Пользователь {login} найден")
+            logger.info("Пользователь %s найден", login)
         except NoResultFound:
             abort(404)
         else:
@@ -74,7 +74,7 @@ class UserService:
                 )
                 session.add(user_info)
                 session.commit()
-                logger.info(f"В историю внесена информация о входе пользователя {login}")
+                logger.info("В историю внесена информация о входе пользователя %s", login)
                 user = self._transform_query_to_dict(user)
                 return user
             abort(401)
@@ -87,7 +87,7 @@ class UserService:
             new_password: str,
             session: sqlalchemy.orm.Session = None,
     ) -> Dict[str, str]:
-        logger.debug(f"Меняем пароль для пользователя с ид {user_id}")
+        logger.debug("Меняем пароль для пользователя с ид %s", user_id)
         try:
             user = session.query(User).filter(User.id == user_id).one()
             logger.info("Пользователь найден в бд")
@@ -110,7 +110,7 @@ class UserService:
             new_login: str,
             session: sqlalchemy.orm.Session = None,
     ) -> Dict[str, str]:
-        logger.debug(f"Меняем e-mail для пользователя с ид {user_id}")
+        logger.debug("Меняем e-mail для пользователя с ид %s", user_id)
         try:
             user = session.query(User).filter(User.id == user_id).one()
             logger.info("Пользователь найден в бд")
@@ -133,7 +133,7 @@ class UserService:
             page_size: int = 20,
             session: sqlalchemy.orm.Session = None,
     ) -> Dict[str, str]:
-        logger.debug(f"Получаем историю по пользователю с ид {user_id}")
+        logger.debug("Получаем историю по пользователю с ид %s", user_id)
         query = session.query(History).filter(History.user_id == user_id).order_by(History.auth_date)
         # query = query.func.count().over()
         # query = session.query([History, func.count().over()])
@@ -150,7 +150,7 @@ class UserService:
             user_id: str,
             session: sqlalchemy.orm.Session = None,
     ) -> Dict[str, str]:
-        logger.debug(f"Получаем полную информацию по пользователю по ид {user_id}")
+        logger.debug("Получаем полную информацию по пользователю по ид %s", user_id)
         try:
             user = session.query(User).filter(User.id == user_id).one()
         except NoResultFound:
