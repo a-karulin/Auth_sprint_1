@@ -28,8 +28,8 @@ class UsersRoles(Base):
     __tablename__ = 'users_roles'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    user_id = Column(UUID(as_uuid=True), ForeignKey(User.id))
-    role_id = Column(UUID(as_uuid=True), ForeignKey(Roles.id))
+    user_id = Column(UUID(as_uuid=True), nullable=False)
+    role_id = Column(UUID(as_uuid=True), nullable=False)
 
 
 class History(Base):
