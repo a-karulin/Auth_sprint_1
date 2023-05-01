@@ -2,13 +2,15 @@ from datetime import timedelta
 from functools import wraps
 from http import HTTPStatus
 from typing import Dict, Tuple, Any
-
+import logging
 import redis
 from flask import jsonify, abort
 from flask_jwt_extended import create_access_token, verify_jwt_in_request, get_jwt
 from flask_jwt_extended import create_refresh_token
 
 from config import redis_config
+
+logger = logging.getLogger(__name__)
 
 
 def admin_access():
@@ -35,6 +37,7 @@ def create_access_and_refresh_tokens(
 ) -> Tuple[str, str]:
     exp_access = timedelta(seconds=seconds)
     exp_refresh = timedelta(days=days)
+    logger.debug("Создаем access и refresh токены")
     access_token = create_access_token(
         identity=identity, additional_claims=payload, expires_delta=exp_access)
     refresh_token = create_refresh_token(
