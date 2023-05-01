@@ -3,6 +3,7 @@ from typing import Dict, Type
 import logging
 import sqlalchemy.orm
 from flask import abort
+from sqlalchemy import func
 from sqlalchemy.exc import NoResultFound
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -129,11 +130,16 @@ class UserService:
     def get_login_history(
             self,
             user_id: str,
-            page_size: int,
+            page: int = 1,
+            page_size: int = 20,
             session: sqlalchemy.orm.Session = None,
     ) -> Dict[str, str]:
         logger.debug(f"Получаем историю по пользователю с ид {user_id}")
-        query = session.query(History).filter(History.user_id == user_id).all()
+        query = session.query(History).filter(History.user_id == user_id).order_by(History.auth_date)
+        # query = query.func.count().over()
+        # query = session.query([History, func.count().over()])
+        skip = (page - 1) * page_size
+        query = query.slice(skip, skip + page_size).all()
         result = dict()
         for row in query:
             result[str(row.auth_date)] = row.user_agent
