@@ -37,7 +37,7 @@ def create_and_delete_user():
         session.add(new_user)
         session.commit()
         yield session
-        session.query(User).filter_by(login=TEST_LOGIN).delete()
+        session.query(User).filter_by(id=TEST_USER_ID).delete()
         session.commit()
 
 
@@ -61,7 +61,7 @@ def get_tokens():
                               headers=headers
                               )
         yield login.json()
-        session.query(User).filter_by(login=TEST_LOGIN).delete()
+        session.query(User).filter_by(id=TEST_USER_ID).delete()
         session.commit()
 
 
@@ -86,7 +86,7 @@ def get_tokens_for_admin():
                               headers=headers
                               )
         yield login.json()
-        session.query(User).filter_by(login=TEST_LOGIN).delete()
+        session.query(User).filter_by(id=TEST_USER_ID).delete()
         session.query(Roles).filter_by(role=TEST_ROLE_NAME).delete()
         session.commit()
 
