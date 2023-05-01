@@ -35,25 +35,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-#
-#  redis:
-#    image: redis:7.0.8
-#    environment:
-#      - ALLOW_EMPTY_PASSWORD=yes
-#    networks:
-#      - yandex_network
-#    volumes:
-#      - ../redis_data:/data
-#    healthcheck:
-#      test: [ "CMD", "redis-cli", "ping" ]
-#      interval: 1s
-#      timeout: 3s
-#      retries: 30
-#    depends_on:
-#      elasticsearch:
-#        condition: service_healthy
-#    ports:
-#      - "6379:6379"
+
+  redis:
+    image: redis:7.0.8
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - yandex_network
+    volumes:
+      - ../redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    ports:
+      - "6379:6379"
 
 networks:
     yandex_network:
