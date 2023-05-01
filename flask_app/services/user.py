@@ -3,7 +3,6 @@ from typing import Dict, Type
 import logging
 import sqlalchemy.orm
 from flask import abort
-from sqlalchemy import func
 from sqlalchemy.exc import NoResultFound
 from werkzeug.security import generate_password_hash, check_password_hash
 
