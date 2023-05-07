@@ -42,7 +42,7 @@ class UserService:
             )
             session.add(new_user)
             session.commit()
-            logger.info(f"Создан пользователь %s", login)
+            logger.info("Создан пользователь %s", login)
             new_user = session.query(User).filter(User.login == login).one()
             new_user = self._transform_query_to_dict(new_user)
             return new_user
