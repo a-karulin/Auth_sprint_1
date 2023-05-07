@@ -16,4 +16,10 @@ class RedisConfig(BaseSettings):
     port: int = Field(env="REDIS_PORT")
 
 
+class GoogleConfig(BaseSettings):
+    client_id: str = Field(env="GOOGLE_CLIENT_ID")
+    secret: str = Field(env="GOOGLE_SECRET")
+
+
 redis_config = RedisConfig()
+google_config = GoogleConfig()
