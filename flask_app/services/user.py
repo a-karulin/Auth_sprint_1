@@ -260,5 +260,9 @@ class UserService:
         )
         session.commit()
 
+        user = self._transform_query_to_dict(user)
+        user['roles'] = self.get_roles_names_for_user(user['id'])
+        return user
+
 
 user_service = UserService()
