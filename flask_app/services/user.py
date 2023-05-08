@@ -1,4 +1,5 @@
 from datetime import datetime
+from random import randint
 from typing import Dict, Type
 import logging
 import sqlalchemy.orm
@@ -7,7 +8,7 @@ from sqlalchemy.exc import NoResultFound
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from database.db import engine, Base
-from database.db_models import User, History, Roles, UsersRoles
+from database.db_models import User, History, Roles, UsersRoles, OauthUsers
 from database.session_decorator import get_session
 from services.utils import get_device_type
 
@@ -42,7 +43,7 @@ class UserService:
             )
             session.add(new_user)
             session.commit()
-            logger.info(f"Создан пользователь %s", login)
+            logger.info("Создан пользователь %s", login)
             new_user = session.query(User).filter(User.login == login).one()
             new_user = self._transform_query_to_dict(new_user)
             return new_user
@@ -183,12 +184,12 @@ class UserService:
 
     @get_session()
     def create_superuser(
-            self,
-            password: str,
-            login: str,
-            first_name: str,
-            last_name: str,
-            session: sqlalchemy.orm.Session = None
+        self,
+        password: str,
+        login: str,
+        first_name: str,
+        last_name: str,
+        session: sqlalchemy.orm.Session = None,
     ):
         logger.debug("Создаем админа")
         try:
@@ -211,6 +212,68 @@ class UserService:
             return new_user
         else:
             abort(400)
+
+    @get_session()
+    def add_login_to_history(
+            self,
+            user_id: str,
+            user_agent: str,
+            session: sqlalchemy.orm.Session = None,
+    ) -> None:
+        session.add(
+            History(
+                user_id=user_id,
+                user_agent=user_agent,
+                auth_date=datetime.utcnow().strftime("%Y-%m-%d %H:%M"),
+            ),
+        )
+        session.commit()
+
+    @get_session()
+    def register_user_oauth(
+        self,
+        user_agent: str,
+        email: str,
+        oauth_id: str,
+        oauth_first_name: str,
+        oauth_last_name: str,
+        session: sqlalchemy.orm.Session = None,
+    ) -> Dict[str, str]:
+        """Юзер добавляется в Users и в OauthUsers, добавляется запись в историю логинов."""
+        try:
+            user = session.query(User).filter(User.login == email).one()
+        except NoResultFound:
+            session.add(
+                User(
+                    password=generate_password_hash(str(randint(1, 10000))),
+                    login=email,
+                    first_name=oauth_first_name,
+                    last_name=oauth_last_name,
+                ),
+            )
+            session.commit()
+            user = session.query(User).filter(User.login == email).one()
+
+        try:
+            session.query(OauthUsers).filter(
+                OauthUsers.oauth_id == oauth_id,
+                OauthUsers.oauth_email == email,
+            ).one()
+        except NoResultFound:
+            session.add(
+                OauthUsers(
+                    user_id=user.id,
+                    oauth_id=oauth_id,
+                    oauth_email=email,
+                ),
+            )
+            session.commit()
+
+        self.add_login_to_history(user_id=user.id, user_agent=user_agent)
+
+        user = self._transform_query_to_dict(user)
+        user['roles'] = self.get_roles_names_for_user(user['id'])
+        return user
 
 
 user_service = UserService()
