@@ -7,9 +7,9 @@ class GoogleOauth:
     def __init__(self):
         self.client_id = google_config.client_id
         self.secret = google_config.secret
-        self.redirect_url = None
+        self.redirect_url = 'http://127.0.0.1/api/v1/users/login-history'
         self.scope = 'email profile openid'
-        self.authorization_url = 'https://accounts.google.com/o/oauth2/auth?client_id={self.client_id}&' \
+        self.authorization_url = f'https://accounts.google.com/o/oauth2/auth?client_id={self.client_id}&' \
                                  f'scope={self.scope}&state=google' \
                                  f'access_type=offline&response_type=code&redirect_uri={self.redirect_url}&'
 
