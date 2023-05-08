@@ -29,3 +29,4 @@ class YandexConfig(BaseSettings):
 
 redis_config = RedisConfig()
 google_config = GoogleConfig()
+yandex_config = YandexConfig()
