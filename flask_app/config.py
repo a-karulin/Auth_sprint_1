@@ -9,6 +9,7 @@ load_dotenv()
 POSTGRES_CONN_STR = os.environ.get('POSTGRES_CONN_STR')
 JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
 JWT_ALGORITHM = os.environ.get('JWT_ALGORITHM')
+BASE_HOST = os.environ.get('BASE_HOST', 'http://127.0.0.1/')
 
 
 class RedisConfig(BaseSettings):
