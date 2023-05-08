@@ -225,6 +225,7 @@ class UserService:
                 user_id=user_id,
                 user_agent=user_agent,
                 auth_date=datetime.utcnow().strftime("%Y-%m-%d %H:%M"),
+                user_device_type=get_device_type(user_agent)
             ),
         )
         session.commit()
