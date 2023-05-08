@@ -1,6 +1,7 @@
 # flask_app/db_models.py
 import uuid
-from sqlalchemy import Column, String, ForeignKey, DateTime, Boolean
+
+from sqlalchemy import Column, String, ForeignKey, DateTime, Boolean, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from database.db import Base
 
@@ -39,3 +40,13 @@ class History(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey(User.id, ondelete='CASCADE'))
     user_agent = Column(String, nullable=False)
     auth_date = Column(DateTime, nullable=False)
+
+
+class OauthUsers(Base):
+    __tablename__ = 'oauth_users'
+    __table_args__ = UniqueConstraint('oauth_id', 'oauth_email', name='oauth_unique'),
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    user_id = Column(UUID(), ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    oauth_id = Column(Text, nullable=False)
+    oauth_email = Column(Text, nullable=False)
