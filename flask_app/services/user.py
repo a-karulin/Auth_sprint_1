@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from database.db import engine, Base
 from database.db_models import User, History, Roles, UsersRoles
 from database.session_decorator import get_session
-
+from services.utils import get_device_type
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,8 @@ class UserService:
                 user_info = History(
                     user_id=user.id,
                     user_agent=user_agent,
-                    auth_date=datetime.utcnow().strftime("%Y-%m-%d %H:%M")
+                    auth_date=datetime.utcnow().strftime("%Y-%m-%d %H:%M"),
+                    user_device_type=get_device_type(user_agent)
                 )
                 session.add(user_info)
                 session.commit()
