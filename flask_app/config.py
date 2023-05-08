@@ -22,5 +22,10 @@ class GoogleConfig(BaseSettings):
     secret: str = Field(env="GOOGLE_SECRET")
 
 
+class YandexConfig(BaseSettings):
+    client_id: str = Field(env="YANDEX_CLIENT_ID")
+    secret: str = Field(env="YANDEX_SECRET")
+
+
 redis_config = RedisConfig()
 google_config = GoogleConfig()
