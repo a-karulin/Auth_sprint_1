@@ -213,6 +213,22 @@ class UserService:
             abort(400)
 
     @get_session()
+    def add_login_to_history(
+            self,
+            user_id: str,
+            user_agent: str,
+            session: sqlalchemy.orm.Session = None,
+    ) -> None:
+        session.add(
+            History(
+                user_id=user_id,
+                user_agent=user_agent,
+                auth_date=datetime.utcnow().strftime("%Y-%m-%d %H:%M"),
+            ),
+        )
+        session.commit()
+
+    @get_session()
     def register_user_oauth(
         self,
         user_agent: str,
@@ -221,7 +237,8 @@ class UserService:
         oauth_first_name: str,
         oauth_last_name: str,
         session: sqlalchemy.orm.Session = None,
-    ):
+    ) -> Dict[str, str]:
+        """Юзер добавляется в Users и в OauthUsers, добавляется запись в историю логинов."""
         try:
             user = session.query(User).filter(User.login == email).one()
         except NoResultFound:
@@ -251,14 +268,7 @@ class UserService:
             )
             session.commit()
 
-        session.add(
-            History(
-                user_id=user.id,
-                user_agent=user_agent,
-                auth_date=datetime.utcnow().strftime("%Y-%m-%d %H:%M"),
-            ),
-        )
-        session.commit()
+        self.add_login_to_history(user_id=user.id, user_agent=user_agent)
 
         user = self._transform_query_to_dict(user)
         user['roles'] = self.get_roles_names_for_user(user['id'])

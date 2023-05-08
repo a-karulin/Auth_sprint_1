@@ -1,3 +1,5 @@
+from typing import Dict
+
 import requests as requests
 from flask import redirect
 
@@ -16,10 +18,10 @@ class GoogleOauth:
                                  f'access_type=offline&response_type=code&redirect_uri={self.redirect_url}&'
 
     def authorize(self):
-        """Редирект на вторизацию в гугле."""
+        """Редирект на авторизацию в гугле."""
         return redirect(self.authorization_url, code=302)
 
-    def get_tokens(self, code: str):
+    def get_tokens(self, code: str) -> Dict[str, str]:
         """Получить токены от гугла по коду."""
         return requests.post(
             url='https://oauth2.googleapis.com/token',
@@ -32,7 +34,7 @@ class GoogleOauth:
             }
         ).json()
 
-    def get_user_info(self, code: str):
+    def get_user_info(self, code: str) -> Dict[str, str]:
         """Получить информацию о юзере гугла по токенам."""
         tokens = self.get_tokens(code)
         return requests.get(
