@@ -36,11 +36,20 @@ def upgrade() -> None:
         sa.Column('id', sa.UUID(), nullable=False),
         sa.Column('user_id', sa.UUID(), nullable=False),
         sa.Column('user_agent', sa.String(length=255), nullable=False),
+        sa.Column('user_device_type', sa.Text(), nullable=False),
         sa.Column('auth_date', sa.DateTime(), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
+        sa.PrimaryKeyConstraint('id', 'user_device_type'),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'],
                                 name='history_fkey', ondelete="CASCADE"),
+        sa.UniqueConstraint('id', 'user_device_type'),
+        postgresql_partition_by='LIST (user_device_type)'
     )
+    op.execute(
+        """CREATE TABLE IF NOT EXISTS "history_tablet" PARTITION OF "history" FOR VALUES IN ('tablet')"""),
+    op.execute(
+        """CREATE TABLE IF NOT EXISTS "history_mobile" PARTITION OF "history" FOR VALUES IN ('mobile')"""),
+    op.execute(
+        """CREATE TABLE IF NOT EXISTS "history_web" PARTITION OF "history" FOR VALUES IN ('web')"""),
 
     op.create_table(
         'roles',
