@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 from flask import Blueprint, request, jsonify
 
+from database.session_decorator import rate_limit
 from services.oauth import GoogleOauth, YandexOauth
 from services.tokens import create_access_and_refresh_tokens
 from services.user import user_service
@@ -10,6 +11,7 @@ oauth = Blueprint('oauth', __name__)
 
 
 @oauth.route("/google", methods=["GET"])
+@rate_limit()
 def authorize_with_google():
     google = GoogleOauth()
     return google.authorize()
@@ -39,6 +41,7 @@ def redirect_google():
 
 
 @oauth.route("/yandex", methods=["GET"])
+@rate_limit()
 def authorize_with_yandex():
     yandex = YandexOauth()
     return yandex.authorize()
