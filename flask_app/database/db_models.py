@@ -9,10 +9,10 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    login = Column(String, unique=True, nullable=False)
-    password = Column(String, nullable=False)
-    first_name = Column(String, nullable=False)
-    last_name = Column(String, nullable=False)
+    login = Column(String(50), unique=True, nullable=False)
+    password = Column(Text, nullable=False)
+    first_name = Column(Text, nullable=False)
+    last_name = Column(Text, nullable=False)
     is_admin = Column(Boolean, default=False)
 
 
@@ -20,7 +20,7 @@ class Roles(Base):
     __tablename__ = 'roles'
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    role = Column(String, unique=True, nullable=False)
+    role = Column(String(50), unique=True, nullable=False)
 
 
 class UsersRoles(Base):
@@ -57,7 +57,7 @@ class History(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey(User.id, ondelete='CASCADE'))
-    user_agent = Column(String, nullable=False)
+    user_agent = Column(Text, nullable=False)
     auth_date = Column(DateTime, nullable=False)
     user_device_type = Column(Text, primary_key=True)
 

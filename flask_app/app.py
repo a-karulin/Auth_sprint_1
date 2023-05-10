@@ -3,6 +3,7 @@ from flask import Flask, request
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
 from flasgger import Swagger
+from opentelemetry.sdk.resources import Resource, SERVICE_NAME
 
 from api.v1.auth import auth
 from api.v1.oauth import oauth
@@ -18,6 +19,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
+from config import jaeger_config
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = POSTGRES_CONN_STR
@@ -64,12 +66,16 @@ def before_request():
 
 
 def configure_tracer() -> None:
-    trace.set_tracer_provider(TracerProvider())
+    resource = Resource(attributes={
+        SERVICE_NAME: 'auth-service'
+    })
+    provider = TracerProvider(resource=resource)
+    trace.set_tracer_provider(provider)
     trace.get_tracer_provider().add_span_processor(
         BatchSpanProcessor(
             JaegerExporter(
-                agent_host_name='localhost',
-                agent_port=6831,
+                agent_host_name=jaeger_config.host,
+                agent_port=jaeger_config.port,
             )
         )
     )
