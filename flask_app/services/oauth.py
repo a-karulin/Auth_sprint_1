@@ -1,5 +1,3 @@
-from typing import Dict
-
 import requests as requests
 from flask import redirect
 
@@ -23,7 +21,7 @@ class GoogleOauth:
         """Редирект на авторизацию в гугле."""
         return redirect(self.authorization_url, code=302)
 
-    def get_tokens(self, code: str) -> Dict[str, str]:
+    def get_tokens(self, code: str) -> dict[str, str]:
         """Получить токены от гугла по коду."""
         return requests.post(
             url='https://oauth2.googleapis.com/token',
@@ -36,7 +34,7 @@ class GoogleOauth:
             }
         ).json()
 
-    def get_user_info(self, code: str) -> Dict[str, str]:
+    def get_user_info(self, code: str) -> dict[str, str]:
         """Получить информацию о юзере гугла по токенам."""
         tokens = self.get_tokens(code)
         return requests.get(
@@ -66,7 +64,7 @@ class YandexOauth:
         """Редирект на авторизацию в яндексе."""
         return redirect(self.authorization_url, code=302)
 
-    def get_tokens(self, code: str) -> Dict[str, str]:
+    def get_tokens(self, code: str) -> dict[str, str]:
         """Получить токены от яндекса по коду."""
         return requests.post(
             url='https://oauth.yandex.ru/token',
@@ -78,7 +76,7 @@ class YandexOauth:
             }
         ).json()
 
-    def get_user_info(self, code: str) -> Dict[str, str]:
+    def get_user_info(self, code: str) -> dict[str, str]:
         """Получить информацию о юзере яндекса по токенам."""
         tokens = self.get_tokens(code)
         return requests.get(
@@ -104,7 +102,3 @@ def get_service_instance(service_name: str):
         return GoogleOauth()
     if service_name == 'yandex':
         return YandexOauth()
-
-
-google_service = GoogleOauth()
-yandex_service = YandexOauth()
