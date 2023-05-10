@@ -1,6 +1,6 @@
 from datetime import datetime
 from random import randint
-from typing import Dict, Type
+from typing import Type
 import logging
 import sqlalchemy.orm
 from flask import abort
@@ -27,7 +27,7 @@ class UserService:
             first_name: str,
             last_name: str,
             session: sqlalchemy.orm.Session = None
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """Зарегистрировать пользователя."""
         logger.debug("Регистрация пользователя")
         try:
@@ -57,7 +57,7 @@ class UserService:
             password: str,
             user_agent: str,
             session: sqlalchemy.orm.Session = None
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """Получить пользователя по логину
         :param login: логин (e-mail пользователя)"""
         logger.debug("Вход пользователя %s в учетную запись", login)
@@ -88,7 +88,7 @@ class UserService:
             old_password: str,
             new_password: str,
             session: sqlalchemy.orm.Session = None,
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         logger.debug("Меняем пароль для пользователя с ид %s", user_id)
         try:
             user = session.query(User).filter(User.id == user_id).one()
@@ -111,7 +111,7 @@ class UserService:
             password: str,
             new_login: str,
             session: sqlalchemy.orm.Session = None,
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         logger.debug("Меняем e-mail для пользователя с ид %s", user_id)
         try:
             user = session.query(User).filter(User.id == user_id).one()
@@ -134,7 +134,7 @@ class UserService:
             page: int = 1,
             page_size: int = 20,
             session: sqlalchemy.orm.Session = None,
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         logger.debug("Получаем историю по пользователю с ид %s", user_id)
         query = session.query(History).filter(History.user_id == user_id).order_by(History.auth_date)
         # query = query.func.count().over()
@@ -151,7 +151,7 @@ class UserService:
             self,
             user_id: str,
             session: sqlalchemy.orm.Session = None,
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         logger.debug("Получаем полную информацию по пользователю по ид %s", user_id)
         try:
             user = session.query(User).filter(User.id == user_id).one()
@@ -175,7 +175,7 @@ class UserService:
         return roles
 
     @staticmethod
-    def _transform_query_to_dict(row: Type[Base]) -> Dict[str, str]:
+    def _transform_query_to_dict(row: Type[Base]) -> dict[str, str]:
         query_as_dict = {}
         for column in row.__table__.columns:
             if column.name != 'password':
@@ -239,7 +239,7 @@ class UserService:
         oauth_first_name: str,
         oauth_last_name: str,
         session: sqlalchemy.orm.Session = None,
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """Юзер добавляется в Users и в OauthUsers, добавляется запись в историю логинов."""
         try:
             user = session.query(User).filter(User.login == email).one()
