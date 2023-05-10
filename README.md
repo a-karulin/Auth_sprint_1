@@ -12,6 +12,9 @@
 3. Jaeger
 4. Партиция по типу девайса на таблицу history
 5. Токены будут проверяться на других микросервисах - задание с контрактом неактуально
+ссылка на проект: https://github.com/fedotovdmitriy14/async_api_movies
+Верификация лежит тут fastapi_solution/src/auth:
+в ручке /films (fastapi_solution/src/api/v1/films) пример использования
 
 
 
