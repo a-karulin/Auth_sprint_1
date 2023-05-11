@@ -65,7 +65,6 @@ if JAEGER_TRACER_ENABLE == 'True':
         if not request_id:
             raise RuntimeError('request id is required')
 
-
     def configure_tracer() -> None:
         resource = Resource(attributes={
             SERVICE_NAME: 'auth-service'
