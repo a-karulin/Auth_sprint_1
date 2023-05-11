@@ -3,12 +3,13 @@ from flask import Flask, request
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
 from flasgger import Swagger
+from opentelemetry.sdk.resources import Resource, SERVICE_NAME
 
 from api.v1.auth import auth
 from api.v1.oauth import oauth
 from api.v1.roles import roles
 from api.v1.users import users
-from config import POSTGRES_CONN_STR, JWT_SECRET_KEY, JWT_ALGORITHM
+from config import POSTGRES_CONN_STR, JWT_SECRET_KEY, JWT_ALGORITHM, JAEGER_TRACER_ENABLE
 from flask_swagger_ui import get_swaggerui_blueprint
 
 from services.user import UserService
@@ -18,6 +19,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
+from config import jaeger_config
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = POSTGRES_CONN_STR
@@ -56,25 +58,29 @@ app.register_blueprint(swagger_blueprint)
 app.cli.add_command(create_superuser)
 
 
-@app.before_request
-def before_request():
-    request_id = request.headers.get('X-Request-Id')
-    if not request_id:
-        raise RuntimeError('request id is required')
+if JAEGER_TRACER_ENABLE == 'True':
+    @app.before_request
+    def before_request():
+        request_id = request.headers.get('X-Request-Id')
+        if not request_id:
+            raise RuntimeError('request id is required')
 
-
-def configure_tracer() -> None:
-    trace.set_tracer_provider(TracerProvider())
-    trace.get_tracer_provider().add_span_processor(
-        BatchSpanProcessor(
-            JaegerExporter(
-                agent_host_name='localhost',
-                agent_port=6831,
+    def configure_tracer() -> None:
+        resource = Resource(attributes={
+            SERVICE_NAME: 'auth-service'
+        })
+        provider = TracerProvider(resource=resource)
+        trace.set_tracer_provider(provider)
+        trace.get_tracer_provider().add_span_processor(
+            BatchSpanProcessor(
+                JaegerExporter(
+                    agent_host_name=jaeger_config.host,
+                    agent_port=jaeger_config.port,
+                )
             )
         )
-    )
-    # Чтобы видеть трейсы в консоли
-    trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(ConsoleSpanExporter()))
+        # Чтобы видеть трейсы в консоли
+        trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(ConsoleSpanExporter()))
 
 
 @app.route('/')

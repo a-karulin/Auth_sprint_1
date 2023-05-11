@@ -22,10 +22,10 @@ def upgrade() -> None:
     op.create_table(
         'users',
         sa.Column('id', sa.UUID(), nullable=False),
-        sa.Column('login', sa.String(length=255), nullable=False),
-        sa.Column('password', sa.String(length=255), nullable=False),
-        sa.Column('first_name', sa.String(length=255), nullable=False),
-        sa.Column('last_name', sa.String(length=255), nullable=False),
+        sa.Column('login', sa.String(length=50), nullable=False),
+        sa.Column('password', sa.Text(), nullable=False),
+        sa.Column('first_name', sa.Text(), nullable=False),
+        sa.Column('last_name', sa.Text(), nullable=False),
         sa.Column('is_admin', sa.Boolean(), default=False),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('login'),
@@ -35,7 +35,7 @@ def upgrade() -> None:
         'history',
         sa.Column('id', sa.UUID(), nullable=False),
         sa.Column('user_id', sa.UUID(), nullable=False),
-        sa.Column('user_agent', sa.String(length=255), nullable=False),
+        sa.Column('user_agent', sa.Text(), nullable=False),
         sa.Column('user_device_type', sa.Text(), nullable=False),
         sa.Column('auth_date', sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint('id', 'user_device_type'),
@@ -54,7 +54,7 @@ def upgrade() -> None:
     op.create_table(
         'roles',
         sa.Column('id', sa.UUID(), nullable=False),
-        sa.Column('role', sa.String(length=255), nullable=False),
+        sa.Column('role', sa.String(length=50), nullable=False),
         sa.PrimaryKeyConstraint('id'),
     )
 
