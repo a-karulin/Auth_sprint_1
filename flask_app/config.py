@@ -11,6 +11,7 @@ JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
 JWT_ALGORITHM = os.environ.get('JWT_ALGORITHM')
 BASE_HOST = os.environ.get('BASE_HOST', 'http://127.0.0.1/')
 RATE_LIMIT_COUNT = int(os.environ.get('RATE_LIMIT_COUNT', 1))
+JAEGER_TRACER_ENABLE = os.environ.get('JAEGER_TRACER_ENABLE', 'True')
 
 
 class RedisConfig(BaseSettings):
